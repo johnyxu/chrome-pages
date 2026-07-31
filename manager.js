@@ -1,5 +1,6 @@
 import { getConnectedFile, connectFile, readLinksFile, writeLinksFile } from './src/storage.js';
 import { removeLink } from './src/linkMerge.js';
+import { filterLinks } from './src/filterLinks.js';
 
 const connectSection = document.getElementById('connect-section');
 const listSection = document.getElementById('list-section');
@@ -8,9 +9,11 @@ const connectBtn = document.getElementById('connect-btn');
 const reconnectBtn = document.getElementById('reconnect-btn');
 const errorEl = document.getElementById('error');
 const linkCountEl = document.getElementById('link-count');
+const searchInput = document.getElementById('search-input');
 
 let currentHandle = null;
 let currentLinks = [];
+let searchQuery = '';
 let busy = false;
 
 function showConnect() {
@@ -38,12 +41,10 @@ function clearError() {
 
 function render() {
   linkList.innerHTML = '';
-  linkCountEl.textContent =
-    currentLinks.length === 0
-      ? ''
-      : `${currentLinks.length} saved link${currentLinks.length === 1 ? '' : 's'}`;
+  const visibleLinks = filterLinks(currentLinks, searchQuery);
 
   if (currentLinks.length === 0) {
+    linkCountEl.textContent = '';
     const emptyLi = document.createElement('li');
     emptyLi.className = 'empty-row';
     emptyLi.textContent = 'No links saved yet — use the popup to save your first tab.';
@@ -51,7 +52,20 @@ function render() {
     return;
   }
 
-  for (const link of currentLinks) {
+  linkCountEl.textContent =
+    searchQuery.trim() === ''
+      ? `${currentLinks.length} saved link${currentLinks.length === 1 ? '' : 's'}`
+      : `${visibleLinks.length} of ${currentLinks.length} saved link${currentLinks.length === 1 ? '' : 's'}`;
+
+  if (visibleLinks.length === 0) {
+    const emptyLi = document.createElement('li');
+    emptyLi.className = 'empty-row';
+    emptyLi.textContent = 'No saved links match your search.';
+    linkList.append(emptyLi);
+    return;
+  }
+
+  for (const link of visibleLinks) {
     const li = document.createElement('li');
     li.className = 'link-item';
 
@@ -136,6 +150,8 @@ async function onRemove(id) {
 async function onConnectClick() {
   try {
     currentHandle = await connectFile();
+    searchQuery = '';
+    searchInput.value = '';
     await loadAndRender();
   } catch (err) {
     console.warn('[tab-saver]', err);
@@ -147,6 +163,10 @@ async function onConnectClick() {
 
 connectBtn.addEventListener('click', onConnectClick);
 reconnectBtn.addEventListener('click', onConnectClick);
+searchInput.addEventListener('input', () => {
+  searchQuery = searchInput.value;
+  render();
+});
 
 async function init() {
   try {
