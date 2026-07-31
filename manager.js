@@ -8,6 +8,7 @@ import {
 import { removeLink } from './src/linkMerge.js';
 import { filterLinks } from './src/filterLinks.js';
 import { groupLinksByDomain } from './src/groupByDomain.js';
+import { logExpected, logUnexpected } from './src/log.js';
 
 const connectSection = document.getElementById('connect-section');
 const listSection = document.getElementById('list-section');
@@ -169,7 +170,7 @@ async function loadAndRender() {
     render();
     showList();
   } catch (err) {
-    console.warn('[tab-saver]', err);
+    logUnexpected('reading connected file', err);
     showError('Could not read the connected file. Please reconnect.');
     showConnect();
   }
@@ -189,7 +190,7 @@ async function onRemove(id) {
       // Re-read from the handle rather than rendering the stale mutated array;
       // if that also fails, loadAndRender()'s own catch already surfaces the
       // inline error + reconnect path.
-      console.warn('[tab-saver]', err);
+      logUnexpected('removing link', err);
       showError('Could not remove — the file may be unavailable. Please reconnect.');
       await loadAndRender();
     }
@@ -207,8 +208,8 @@ async function onConnectClick() {
     searchInput.value = '';
     await loadAndRender();
   } catch (err) {
-    console.warn('[tab-saver]', err);
     if (err.name !== 'AbortError') {
+      logUnexpected('connecting file', err);
       showError('Could not connect the file. Please try again.');
     }
   }
@@ -219,6 +220,7 @@ async function onGrantClick() {
   try {
     const granted = await regrantPermission(pendingHandle);
     if (!granted) {
+      logExpected('grant access', 'user did not grant permission');
       showError('Permission was not granted. Connect a different file instead.');
       return;
     }
@@ -227,7 +229,7 @@ async function onGrantClick() {
     clearError();
     await loadAndRender();
   } catch (err) {
-    console.warn('[tab-saver]', err);
+    logUnexpected('granting access', err);
     showError('Could not verify permission. Please try again or connect a different file.');
   }
 }
@@ -244,11 +246,17 @@ async function init() {
   try {
     currentHandle = await getConnectedFile();
   } catch (err) {
-    console.warn('[tab-saver]', err);
     if (err.code === 'PERMISSION_DENIED' && err.handle) {
+      // Expected on every page load until the user clicks "Grant access" —
+      // Chrome resets File System Access permission grants on every
+      // extension reload, so this isn't a bug, just the normal pre-repair
+      // state. Logged at debug level so it doesn't pile up as an extension
+      // "error" in chrome://extensions.
+      logExpected('permission check at load', err);
       showError('Permission to your saved-links file was lost.');
       showPermissionLostUI(err.handle);
     } else {
+      logUnexpected('permission check at load', err);
       showError('Could not access the previously connected file. Please reconnect.');
       resetConnectUI();
     }

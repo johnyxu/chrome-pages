@@ -1,6 +1,7 @@
-import { getConnectedFile, getConnectedFileForAction, readLinksFile, writeLinksFile } from './src/storage.js';
+import { getConnectedFileForAction, readLinksFile, writeLinksFile } from './src/storage.js';
 import { mergeLinks } from './src/linkMerge.js';
 import { tabsToEntries } from './src/tabsToEntries.js';
+import { logExpected, logUnexpected } from './src/log.js';
 
 const saveAllBtn = document.getElementById('save-all-btn');
 const saveCurrentBtn = document.getElementById('save-current-btn');
@@ -27,8 +28,15 @@ async function saveTabs(tabs) {
       // to reconnect the file from scratch.
       handle = await getConnectedFileForAction();
     } catch (err) {
-      console.warn('[tab-saver]', err);
-      statusEl.textContent = err.code === 'PERMISSION_DENIED' ? PERMISSION_DENIED_MESSAGE : NO_FILE_MESSAGE;
+      if (err.code === 'PERMISSION_DENIED') {
+        // Expected when the user declines (or dismisses) the permission
+        // prompt that getConnectedFileForAction() just showed — not a bug.
+        logExpected('save: permission not granted', err);
+        statusEl.textContent = PERMISSION_DENIED_MESSAGE;
+      } else {
+        logUnexpected('save: checking connected file', err);
+        statusEl.textContent = NO_FILE_MESSAGE;
+      }
       return;
     }
     if (!handle) {
@@ -50,7 +58,7 @@ async function saveTabs(tabs) {
       await writeLinksFile(handle, links);
       statusEl.textContent = `Saved ${addedCount} tab(s), skipped ${skippedCount} already-saved.`;
     } catch (err) {
-      console.warn('[tab-saver]', err);
+      logUnexpected('save: reading/writing file', err);
       statusEl.textContent = 'Could not save — the connected file may be missing. Reconnect it from "View saved links".';
     }
   } finally {
@@ -75,21 +83,26 @@ manageLink.addEventListener('click', (e) => {
 
 async function init() {
   try {
-    // Passive check only (no requestPermission prompt) since there's no user
-    // gesture at popup load. A PERMISSION_DENIED here doesn't mean "no file
-    // connected" — a file was connected before, it just needs its permission
-    // re-requested, which saveTabs() does automatically once the user clicks
-    // Save (a real click provides the gesture requestPermission needs). So
-    // leave the buttons enabled in that case rather than disabling them.
-    const handle = await getConnectedFile();
+    // Opening the popup (clicking the toolbar icon) is itself a user action,
+    // so try requesting permission right away — getConnectedFileForAction()
+    // is allowed to prompt. If Chrome doesn't carry enough activation into
+    // the popup for that to work, verifyPermission() catches the resulting
+    // SecurityError internally and this just throws PERMISSION_DENIED like
+    // normal, same as the passive check would have — no worse off either way.
+    const handle = await getConnectedFileForAction();
     if (!handle) {
       saveAllBtn.disabled = true;
       saveCurrentBtn.disabled = true;
       statusEl.textContent = NO_FILE_MESSAGE;
     }
   } catch (err) {
-    console.warn('[tab-saver]', err);
-    if (err.code !== 'PERMISSION_DENIED') {
+    if (err.code === 'PERMISSION_DENIED') {
+      // Expected if the prompt above didn't grant access (declined, or no
+      // activation to show it) — not a bug. saveTabs() retries this on every
+      // Save click, which always has a real click gesture behind it.
+      logExpected('permission check at load', err);
+    } else {
+      logUnexpected('permission check at load', err);
       saveAllBtn.disabled = true;
       saveCurrentBtn.disabled = true;
       statusEl.textContent = NO_FILE_MESSAGE;

@@ -1,8 +1,10 @@
 import { parseLinksFile, serializeLinksFile } from './linksFile.js';
+import { logExpected, logUnexpected } from './log.js';
 
 const DB_NAME = 'tab-saver';
 const STORE_NAME = 'handles';
 const HANDLE_KEY = 'linksFile';
+const BACKUP_HANDLE_KEY = 'backupFile';
 
 function openDb() {
   return new Promise((resolve, reject) => {
@@ -15,35 +17,47 @@ function openDb() {
   });
 }
 
-async function getStoredHandle() {
+async function getStoredValue(key) {
   const db = await openDb();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, 'readonly');
-    const req = tx.objectStore(STORE_NAME).get(HANDLE_KEY);
+    const req = tx.objectStore(STORE_NAME).get(key);
     req.onsuccess = () => resolve(req.result || null);
     req.onerror = () => reject(req.error);
   });
 }
 
-async function setStoredHandle(handle) {
+async function setStoredValue(key, value) {
   const db = await openDb();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, 'readwrite');
-    tx.objectStore(STORE_NAME).put(handle, HANDLE_KEY);
+    tx.objectStore(STORE_NAME).put(value, key);
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
   });
 }
 
+function suggestBackupName(mainName) {
+  return `${mainName.replace(/\.json$/i, '')}.bak.json`;
+}
+
 // requestPermission() requires transient user activation (a real click) —
 // calling it with no active gesture throws a SecurityError instead of
-// resolving to 'denied'. `allowPrompt` must only be set to true by callers
-// that run inside a user-gesture handler (a click), never from page-load
-// code like init().
+// resolving to 'denied'. `allowPrompt` should only be set to true by callers
+// that have a reasonable chance of running with an active gesture (a click
+// handler, or a popup opened by clicking the toolbar icon). Any failure —
+// a real 'denied' choice, or a thrown SecurityError from insufficient
+// activation — is normalized to `false` here so callers always get a plain
+// PERMISSION_DENIED and never have to handle a raw DOMException themselves.
 async function verifyPermission(handle, mode = 'readwrite', { allowPrompt = false } = {}) {
   if ((await handle.queryPermission({ mode })) === 'granted') return true;
   if (allowPrompt) {
-    return (await handle.requestPermission({ mode })) === 'granted';
+    try {
+      return (await handle.requestPermission({ mode })) === 'granted';
+    } catch (err) {
+      logUnexpected('requestPermission', err);
+      return false;
+    }
   }
   return false;
 }
@@ -60,7 +74,23 @@ export async function connectFile() {
     suggestedName: 'saved-tabs.json',
     types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
   });
-  await setStoredHandle(handle);
+  await setStoredValue(HANDLE_KEY, handle);
+
+  // The backup file is optional: if the user cancels this second picker (or
+  // it fails for any other reason), keep the main connection and just skip
+  // the backup rather than aborting the whole connect flow.
+  try {
+    const backupHandle = await window.showSaveFilePicker({
+      suggestedName: suggestBackupName(handle.name),
+      types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+    });
+    await setStoredValue(BACKUP_HANDLE_KEY, backupHandle);
+  } catch (err) {
+    // Expected: the user commonly cancels this second picker to skip having
+    // a backup at all.
+    logExpected('backup file not connected', err);
+  }
+
   return handle;
 }
 
@@ -73,7 +103,7 @@ export async function connectFile() {
 // permission on it directly (via regrantPermission()) instead of forcing the
 // user to re-pick the file from scratch.
 export async function getConnectedFile() {
-  const handle = await getStoredHandle();
+  const handle = await getStoredValue(HANDLE_KEY);
   if (!handle) return null;
   const ok = await verifyPermission(handle, 'readwrite');
   if (!ok) throw permissionDeniedError(handle);
@@ -85,7 +115,7 @@ export async function getConnectedFile() {
 // — Chrome shows a lightweight permission prompt, not the file picker — so
 // access can be restored without reconnecting the file from scratch.
 export async function getConnectedFileForAction() {
-  const handle = await getStoredHandle();
+  const handle = await getStoredValue(HANDLE_KEY);
   if (!handle) return null;
   const ok = await verifyPermission(handle, 'readwrite', { allowPrompt: true });
   if (!ok) throw permissionDeniedError(handle);
@@ -108,4 +138,21 @@ export async function writeLinksFile(handle, links) {
   const writable = await handle.createWritable();
   await writable.write(serializeLinksFile(links));
   await writable.close();
+
+  // Best-effort: mirror the same content into the backup file, if one is
+  // connected. A backup write failure (lost permission, file moved) never
+  // fails the primary write — it's a safety net, not a requirement. Since
+  // it's written with the same `links` array on every save AND remove, an
+  // entry only disappears from the backup when it's removed from the main
+  // file too (a save only ever adds entries, never removes them).
+  const backupHandle = await getStoredValue(BACKUP_HANDLE_KEY);
+  if (backupHandle) {
+    try {
+      const backupWritable = await backupHandle.createWritable();
+      await backupWritable.write(serializeLinksFile(links));
+      await backupWritable.close();
+    } catch (err) {
+      logUnexpected('backup write failed', err);
+    }
+  }
 }
