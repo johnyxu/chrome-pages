@@ -73,8 +73,17 @@ async function loadAndRender() {
 
 async function onRemove(id) {
   currentLinks = removeLink(currentLinks, id);
-  await writeLinksFile(currentHandle, currentLinks);
-  render();
+  try {
+    await writeLinksFile(currentHandle, currentLinks);
+    render();
+  } catch (err) {
+    // The write failed (e.g. the file was moved/deleted or permission was
+    // revoked after load), so `currentLinks` is now out of sync with disk.
+    // Re-read from the handle rather than rendering the stale mutated array;
+    // if that also fails, loadAndRender()'s own catch already surfaces the
+    // inline error + reconnect path.
+    await loadAndRender();
+  }
 }
 
 async function onConnectClick() {
@@ -92,7 +101,17 @@ connectBtn.addEventListener('click', onConnectClick);
 reconnectBtn.addEventListener('click', onConnectClick);
 
 async function init() {
-  currentHandle = await getConnectedFile();
+  try {
+    currentHandle = await getConnectedFile();
+  } catch (err) {
+    if (err.code === 'PERMISSION_DENIED') {
+      showError('Permission to your saved-links file was lost. Please reconnect.');
+    } else {
+      showError('Could not access the previously connected file. Please reconnect.');
+    }
+    showConnect();
+    return;
+  }
   if (!currentHandle) {
     showConnect();
     return;

@@ -51,11 +51,24 @@ export async function connectFile() {
   return handle;
 }
 
+// Returns null only when no file has ever been connected (no stored handle).
+// If a handle is stored but permission was denied/revoked, throws an Error
+// with `.code === 'PERMISSION_DENIED'` instead of returning null, so callers
+// can tell "never connected" apart from "lost access to a previously
+// connected file". Callers that don't care about the distinction can treat
+// any thrown error the same as a null result (e.g. show the "no file
+// connected" state) by catching and checking `err.code` only if they want
+// the more specific message.
 export async function getConnectedFile() {
   const handle = await getStoredHandle();
   if (!handle) return null;
   const ok = await verifyPermission(handle, 'readwrite');
-  return ok ? handle : null;
+  if (!ok) {
+    const err = new Error('Permission to the connected file was denied.');
+    err.code = 'PERMISSION_DENIED';
+    throw err;
+  }
+  return handle;
 }
 
 export async function readLinksFile(handle) {
