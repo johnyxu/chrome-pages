@@ -7,6 +7,7 @@ const linkList = document.getElementById('link-list');
 const connectBtn = document.getElementById('connect-btn');
 const reconnectBtn = document.getElementById('reconnect-btn');
 const errorEl = document.getElementById('error');
+const linkCountEl = document.getElementById('link-count');
 
 let currentHandle = null;
 let currentLinks = [];
@@ -15,11 +16,14 @@ let busy = false;
 function showConnect() {
   connectSection.hidden = false;
   listSection.hidden = true;
+  reconnectBtn.hidden = true;
+  linkCountEl.textContent = '';
 }
 
 function showList() {
   connectSection.hidden = true;
   listSection.hidden = false;
+  reconnectBtn.hidden = false;
 }
 
 function showError(message) {
@@ -34,27 +38,56 @@ function clearError() {
 
 function render() {
   linkList.innerHTML = '';
+  linkCountEl.textContent =
+    currentLinks.length === 0
+      ? ''
+      : `${currentLinks.length} saved link${currentLinks.length === 1 ? '' : 's'}`;
+
+  if (currentLinks.length === 0) {
+    const emptyLi = document.createElement('li');
+    emptyLi.className = 'empty-row';
+    emptyLi.textContent = 'No links saved yet — use the popup to save your first tab.';
+    linkList.append(emptyLi);
+    return;
+  }
+
   for (const link of currentLinks) {
     const li = document.createElement('li');
+    li.className = 'link-item';
+
+    const main = document.createElement('div');
+    main.className = 'link-main';
 
     const a = document.createElement('a');
+    a.className = 'link-title';
     a.href = link.url;
     a.textContent = link.title;
     a.target = '_blank';
 
+    const meta = document.createElement('div');
+    meta.className = 'link-meta';
+
     const urlSpan = document.createElement('span');
-    urlSpan.className = 'url';
+    urlSpan.className = 'link-url';
     urlSpan.textContent = link.url;
 
+    const dotSpan = document.createElement('span');
+    dotSpan.className = 'link-dot';
+    dotSpan.textContent = '·';
+
     const savedAtSpan = document.createElement('span');
-    savedAtSpan.className = 'saved-at';
+    savedAtSpan.className = 'link-date';
     savedAtSpan.textContent = new Date(link.savedAt).toLocaleDateString();
 
+    meta.append(urlSpan, dotSpan, savedAtSpan);
+    main.append(a, meta);
+
     const removeBtn = document.createElement('button');
+    removeBtn.className = 'btn btn-remove';
     removeBtn.textContent = 'Remove';
     removeBtn.addEventListener('click', () => onRemove(link.id));
 
-    li.append(a, urlSpan, savedAtSpan, removeBtn);
+    li.append(main, removeBtn);
     linkList.append(li);
   }
 }

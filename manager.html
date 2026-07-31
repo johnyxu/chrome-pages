@@ -6,15 +6,20 @@
   <link rel="stylesheet" href="manager.css" />
 </head>
 <body>
-  <h1>Saved Links</h1>
-  <div id="error" hidden></div>
-  <div id="connect-section">
+  <header class="page-header">
+    <div>
+      <h1>Saved Links</h1>
+      <p class="subtitle" id="link-count"></p>
+    </div>
+    <button id="reconnect-btn" class="btn btn-secondary" hidden>Connect a different file</button>
+  </header>
+  <div id="error" class="banner" hidden></div>
+  <div id="connect-section" class="empty-state">
     <p>No file connected yet.</p>
-    <button id="connect-btn">Connect a file</button>
+    <button id="connect-btn" class="btn btn-primary">Connect a file</button>
   </div>
   <div id="list-section" hidden>
-    <button id="reconnect-btn">Connect a different file</button>
-    <ul id="link-list"></ul>
+    <ul id="link-list" class="link-list"></ul>
   </div>
   <script type="module" src="manager.js"></script>
 </body>
