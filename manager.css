@@ -1,0 +1,6 @@
+body { font-family: system-ui, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; }
+#error { background: #fee; border: 1px solid #f99; padding: 8px 12px; margin-bottom: 12px; }
+#link-list { list-style: none; padding: 0; }
+#link-list li { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid #eee; }
+#link-list li a { flex: 1; }
+#link-list li .url { flex: 2; color: #666; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
