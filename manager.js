@@ -4,6 +4,8 @@ import {
   readLinksFile,
   writeLinksFile,
   regrantPermission,
+  getViewMode,
+  setViewMode,
 } from './src/storage.js';
 import { removeLink } from './src/linkMerge.js';
 import { filterLinks } from './src/filterLinks.js';
@@ -20,12 +22,15 @@ const reconnectBtn = document.getElementById('reconnect-btn');
 const errorEl = document.getElementById('error');
 const linkCountEl = document.getElementById('link-count');
 const searchInput = document.getElementById('search-input');
+const viewListBtn = document.getElementById('view-list-btn');
+const viewCardBtn = document.getElementById('view-card-btn');
 
 let currentHandle = null;
 let currentLinks = [];
 let searchQuery = '';
 let busy = false;
 let pendingHandle = null;
+let viewMode = 'list';
 
 function showPermissionLostUI(handle) {
   pendingHandle = handle;
@@ -115,6 +120,43 @@ function renderLinkItem(link) {
   return li;
 }
 
+function renderLinkCard(link) {
+  const card = document.createElement('div');
+  card.className = 'link-card';
+
+  const a = document.createElement('a');
+  a.className = 'card-title';
+  a.href = link.url;
+  a.textContent = link.title;
+  a.target = '_blank';
+
+  const urlDiv = document.createElement('div');
+  urlDiv.className = 'card-url';
+  urlDiv.textContent = link.url;
+
+  const footer = document.createElement('div');
+  footer.className = 'card-footer';
+
+  const dateSpan = document.createElement('span');
+  dateSpan.className = 'card-date';
+  dateSpan.textContent = new Date(link.savedAt).toLocaleDateString();
+
+  const removeBtn = document.createElement('button');
+  removeBtn.className = 'btn btn-remove';
+  removeBtn.textContent = 'Remove';
+  removeBtn.addEventListener('click', () => onRemove(link.id));
+
+  footer.append(dateSpan, removeBtn);
+  card.append(a, urlDiv, footer);
+  return card;
+}
+
+function applyViewMode(mode) {
+  viewMode = mode === 'card' ? 'card' : 'list';
+  viewListBtn.setAttribute('aria-pressed', String(viewMode === 'list'));
+  viewCardBtn.setAttribute('aria-pressed', String(viewMode === 'card'));
+}
+
 function render() {
   linkList.innerHTML = '';
   const visibleLinks = filterLinks(currentLinks, searchQuery);
@@ -147,13 +189,13 @@ function render() {
     countSpan.textContent = ` (${group.links.length})`;
     header.append(countSpan);
 
-    const ul = document.createElement('ul');
-    ul.className = 'link-list';
+    const container = document.createElement(viewMode === 'card' ? 'div' : 'ul');
+    container.className = viewMode === 'card' ? 'link-cards' : 'link-list';
     for (const link of group.links) {
-      ul.append(renderLinkItem(link));
+      container.append(viewMode === 'card' ? renderLinkCard(link) : renderLinkItem(link));
     }
 
-    section.append(header, ul);
+    section.append(header, container);
     linkList.append(section);
   }
 }
@@ -242,7 +284,23 @@ searchInput.addEventListener('input', () => {
   render();
 });
 
+function onViewModeClick(mode) {
+  if (mode === viewMode) return;
+  applyViewMode(mode);
+  render();
+  setViewMode(mode).catch((err) => logUnexpected('saving view mode', err));
+}
+
+viewListBtn.addEventListener('click', () => onViewModeClick('list'));
+viewCardBtn.addEventListener('click', () => onViewModeClick('card'));
+
 async function init() {
+  try {
+    applyViewMode(await getViewMode());
+  } catch (err) {
+    logUnexpected('loading view mode', err);
+  }
+
   try {
     currentHandle = await getConnectedFile();
   } catch (err) {

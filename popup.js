@@ -24,6 +24,10 @@ const CORRUPTED_MESSAGE = 'The connected file isn\'t a valid Tab Saver file — 
 
 let busy = false;
 
+function setManageLinkCount(count) {
+  manageLink.textContent = count === null ? 'View saved links' : `View saved links (${count})`;
+}
+
 async function closeSavedTabs(tabs, entries) {
   if (!(await getCloseTabAfterSave())) return;
   const savedUrls = new Set(entries.map((entry) => entry.url));
@@ -72,6 +76,7 @@ async function saveTabs(tabs) {
       }
       const entries = tabsToEntries(tabs);
       const { links, addedCount, skippedCount } = mergeLinks(existingLinks, entries);
+      setManageLinkCount(links.length);
       if (addedCount === 0) {
         statusEl.textContent = 'Already saved.';
         await closeSavedTabs(tabs, entries);
@@ -133,6 +138,13 @@ async function init() {
       saveAllBtn.disabled = true;
       saveCurrentBtn.disabled = true;
       statusEl.textContent = NO_FILE_MESSAGE;
+    } else {
+      try {
+        const { links, corrupted } = await readLinksFile(handle);
+        setManageLinkCount(corrupted ? 0 : links.length);
+      } catch (err) {
+        logUnexpected('reading count at load', err);
+      }
     }
   } catch (err) {
     if (err.code === 'PERMISSION_DENIED') {

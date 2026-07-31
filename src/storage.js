@@ -6,6 +6,7 @@ const STORE_NAME = 'handles';
 const HANDLE_KEY = 'linksFile';
 const BACKUP_HANDLE_KEY = 'backupFile';
 const CLOSE_TAB_AFTER_SAVE_KEY = 'closeTabAfterSave';
+const VIEW_MODE_KEY = 'viewMode';
 
 function openDb() {
   return new Promise((resolve, reject) => {
@@ -138,6 +139,14 @@ export async function getCloseTabAfterSave() {
 
 export async function setCloseTabAfterSave(value) {
   await setStoredValue(CLOSE_TAB_AFTER_SAVE_KEY, Boolean(value));
+}
+
+export async function getViewMode() {
+  return (await getStoredValue(VIEW_MODE_KEY)) === 'card' ? 'card' : 'list';
+}
+
+export async function setViewMode(mode) {
+  await setStoredValue(VIEW_MODE_KEY, mode === 'card' ? 'card' : 'list');
 }
 
 export async function readLinksFile(handle) {
