@@ -7,6 +7,16 @@
 </head>
 <body>
   <div class="popup">
+    <div class="popup-header">
+      <span class="popup-title">Tab Saver</span>
+      <button id="settings-btn" class="icon-btn" type="button" aria-label="Settings" title="Settings">⚙</button>
+    </div>
+    <div id="settings-panel" class="settings-panel" hidden>
+      <label class="settings-row">
+        <input type="checkbox" id="close-tab-toggle" />
+        Close tab after saving
+      </label>
+    </div>
     <button id="save-all-btn">Save All Tabs</button>
     <button id="save-current-btn">Save Current Tab</button>
     <p id="status"></p>

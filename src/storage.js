@@ -5,6 +5,7 @@ const DB_NAME = 'tab-saver';
 const STORE_NAME = 'handles';
 const HANDLE_KEY = 'linksFile';
 const BACKUP_HANDLE_KEY = 'backupFile';
+const CLOSE_TAB_AFTER_SAVE_KEY = 'closeTabAfterSave';
 
 function openDb() {
   return new Promise((resolve, reject) => {
@@ -22,7 +23,10 @@ async function getStoredValue(key) {
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, 'readonly');
     const req = tx.objectStore(STORE_NAME).get(key);
-    req.onsuccess = () => resolve(req.result || null);
+    // `req.result` is `undefined` for a missing key — but a stored `false`
+    // (a legitimate settings value) must round-trip as `false`, not get
+    // coalesced into `null` the way `req.result || null` would.
+    req.onsuccess = () => resolve(req.result === undefined ? null : req.result);
     req.onerror = () => reject(req.error);
   });
 }
@@ -126,6 +130,14 @@ export async function getConnectedFileForAction() {
 // user-gesture handler (a click) — see verifyPermission's allowPrompt note.
 export async function regrantPermission(handle) {
   return (await handle.requestPermission({ mode: 'readwrite' })) === 'granted';
+}
+
+export async function getCloseTabAfterSave() {
+  return (await getStoredValue(CLOSE_TAB_AFTER_SAVE_KEY)) === true;
+}
+
+export async function setCloseTabAfterSave(value) {
+  await setStoredValue(CLOSE_TAB_AFTER_SAVE_KEY, Boolean(value));
 }
 
 export async function readLinksFile(handle) {
