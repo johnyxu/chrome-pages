@@ -15,12 +15,15 @@
   </header>
   <div id="error" class="banner" hidden></div>
   <div id="connect-section" class="empty-state">
-    <p>No file connected yet.</p>
-    <button id="connect-btn" class="btn btn-primary">Connect a file</button>
+    <p id="connect-message">No file connected yet.</p>
+    <div class="empty-state-actions">
+      <button id="grant-btn" class="btn btn-primary" hidden>Grant access</button>
+      <button id="connect-btn" class="btn btn-primary">Connect a file</button>
+    </div>
   </div>
   <div id="list-section" hidden>
     <input id="search-input" class="search-input" type="search" placeholder="Search by title or URL…" />
-    <ul id="link-list" class="link-list"></ul>
+    <div id="link-list" class="link-groups"></div>
   </div>
   <script type="module" src="manager.js"></script>
 </body>

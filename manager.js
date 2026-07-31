@@ -1,11 +1,20 @@
-import { getConnectedFile, connectFile, readLinksFile, writeLinksFile } from './src/storage.js';
+import {
+  getConnectedFile,
+  connectFile,
+  readLinksFile,
+  writeLinksFile,
+  regrantPermission,
+} from './src/storage.js';
 import { removeLink } from './src/linkMerge.js';
 import { filterLinks } from './src/filterLinks.js';
+import { groupLinksByDomain } from './src/groupByDomain.js';
 
 const connectSection = document.getElementById('connect-section');
 const listSection = document.getElementById('list-section');
 const linkList = document.getElementById('link-list');
+const connectMessageEl = document.getElementById('connect-message');
 const connectBtn = document.getElementById('connect-btn');
+const grantBtn = document.getElementById('grant-btn');
 const reconnectBtn = document.getElementById('reconnect-btn');
 const errorEl = document.getElementById('error');
 const linkCountEl = document.getElementById('link-count');
@@ -15,6 +24,25 @@ let currentHandle = null;
 let currentLinks = [];
 let searchQuery = '';
 let busy = false;
+let pendingHandle = null;
+
+function showPermissionLostUI(handle) {
+  pendingHandle = handle;
+  connectMessageEl.textContent = 'Access to your previously connected file was lost.';
+  grantBtn.hidden = false;
+  connectBtn.textContent = 'Or connect a different file';
+  connectBtn.classList.remove('btn-primary');
+  connectBtn.classList.add('btn-secondary');
+}
+
+function resetConnectUI() {
+  pendingHandle = null;
+  connectMessageEl.textContent = 'No file connected yet.';
+  grantBtn.hidden = true;
+  connectBtn.textContent = 'Connect a file';
+  connectBtn.classList.add('btn-primary');
+  connectBtn.classList.remove('btn-secondary');
+}
 
 function showConnect() {
   connectSection.hidden = false;
@@ -39,16 +67,60 @@ function clearError() {
   errorEl.textContent = '';
 }
 
+function renderEmptyMessage(text) {
+  const p = document.createElement('p');
+  p.className = 'empty-row';
+  p.textContent = text;
+  linkList.append(p);
+}
+
+function renderLinkItem(link) {
+  const li = document.createElement('li');
+  li.className = 'link-item';
+
+  const main = document.createElement('div');
+  main.className = 'link-main';
+
+  const a = document.createElement('a');
+  a.className = 'link-title';
+  a.href = link.url;
+  a.textContent = link.title;
+  a.target = '_blank';
+
+  const meta = document.createElement('div');
+  meta.className = 'link-meta';
+
+  const urlSpan = document.createElement('span');
+  urlSpan.className = 'link-url';
+  urlSpan.textContent = link.url;
+
+  const dotSpan = document.createElement('span');
+  dotSpan.className = 'link-dot';
+  dotSpan.textContent = '·';
+
+  const savedAtSpan = document.createElement('span');
+  savedAtSpan.className = 'link-date';
+  savedAtSpan.textContent = new Date(link.savedAt).toLocaleDateString();
+
+  meta.append(urlSpan, dotSpan, savedAtSpan);
+  main.append(a, meta);
+
+  const removeBtn = document.createElement('button');
+  removeBtn.className = 'btn btn-remove';
+  removeBtn.textContent = 'Remove';
+  removeBtn.addEventListener('click', () => onRemove(link.id));
+
+  li.append(main, removeBtn);
+  return li;
+}
+
 function render() {
   linkList.innerHTML = '';
   const visibleLinks = filterLinks(currentLinks, searchQuery);
 
   if (currentLinks.length === 0) {
     linkCountEl.textContent = '';
-    const emptyLi = document.createElement('li');
-    emptyLi.className = 'empty-row';
-    emptyLi.textContent = 'No links saved yet — use the popup to save your first tab.';
-    linkList.append(emptyLi);
+    renderEmptyMessage('No links saved yet — use the popup to save your first tab.');
     return;
   }
 
@@ -58,51 +130,30 @@ function render() {
       : `${visibleLinks.length} of ${currentLinks.length} saved link${currentLinks.length === 1 ? '' : 's'}`;
 
   if (visibleLinks.length === 0) {
-    const emptyLi = document.createElement('li');
-    emptyLi.className = 'empty-row';
-    emptyLi.textContent = 'No saved links match your search.';
-    linkList.append(emptyLi);
+    renderEmptyMessage('No saved links match your search.');
     return;
   }
 
-  for (const link of visibleLinks) {
-    const li = document.createElement('li');
-    li.className = 'link-item';
+  for (const group of groupLinksByDomain(visibleLinks)) {
+    const section = document.createElement('section');
+    section.className = 'link-group';
 
-    const main = document.createElement('div');
-    main.className = 'link-main';
+    const header = document.createElement('h2');
+    header.className = 'group-header';
+    header.textContent = group.domain;
+    const countSpan = document.createElement('span');
+    countSpan.className = 'group-count';
+    countSpan.textContent = ` (${group.links.length})`;
+    header.append(countSpan);
 
-    const a = document.createElement('a');
-    a.className = 'link-title';
-    a.href = link.url;
-    a.textContent = link.title;
-    a.target = '_blank';
+    const ul = document.createElement('ul');
+    ul.className = 'link-list';
+    for (const link of group.links) {
+      ul.append(renderLinkItem(link));
+    }
 
-    const meta = document.createElement('div');
-    meta.className = 'link-meta';
-
-    const urlSpan = document.createElement('span');
-    urlSpan.className = 'link-url';
-    urlSpan.textContent = link.url;
-
-    const dotSpan = document.createElement('span');
-    dotSpan.className = 'link-dot';
-    dotSpan.textContent = '·';
-
-    const savedAtSpan = document.createElement('span');
-    savedAtSpan.className = 'link-date';
-    savedAtSpan.textContent = new Date(link.savedAt).toLocaleDateString();
-
-    meta.append(urlSpan, dotSpan, savedAtSpan);
-    main.append(a, meta);
-
-    const removeBtn = document.createElement('button');
-    removeBtn.className = 'btn btn-remove';
-    removeBtn.textContent = 'Remove';
-    removeBtn.addEventListener('click', () => onRemove(link.id));
-
-    li.append(main, removeBtn);
-    linkList.append(li);
+    section.append(header, ul);
+    linkList.append(section);
   }
 }
 
@@ -150,6 +201,8 @@ async function onRemove(id) {
 async function onConnectClick() {
   try {
     currentHandle = await connectFile();
+    resetConnectUI();
+    clearError();
     searchQuery = '';
     searchInput.value = '';
     await loadAndRender();
@@ -161,8 +214,27 @@ async function onConnectClick() {
   }
 }
 
+async function onGrantClick() {
+  if (!pendingHandle) return;
+  try {
+    const granted = await regrantPermission(pendingHandle);
+    if (!granted) {
+      showError('Permission was not granted. Connect a different file instead.');
+      return;
+    }
+    currentHandle = pendingHandle;
+    resetConnectUI();
+    clearError();
+    await loadAndRender();
+  } catch (err) {
+    console.warn('[tab-saver]', err);
+    showError('Could not verify permission. Please try again or connect a different file.');
+  }
+}
+
 connectBtn.addEventListener('click', onConnectClick);
 reconnectBtn.addEventListener('click', onConnectClick);
+grantBtn.addEventListener('click', onGrantClick);
 searchInput.addEventListener('input', () => {
   searchQuery = searchInput.value;
   render();
@@ -173,15 +245,18 @@ async function init() {
     currentHandle = await getConnectedFile();
   } catch (err) {
     console.warn('[tab-saver]', err);
-    if (err.code === 'PERMISSION_DENIED') {
-      showError('Permission to your saved-links file was lost. Please reconnect.');
+    if (err.code === 'PERMISSION_DENIED' && err.handle) {
+      showError('Permission to your saved-links file was lost.');
+      showPermissionLostUI(err.handle);
     } else {
       showError('Could not access the previously connected file. Please reconnect.');
+      resetConnectUI();
     }
     showConnect();
     return;
   }
   if (!currentHandle) {
+    resetConnectUI();
     showConnect();
     return;
   }

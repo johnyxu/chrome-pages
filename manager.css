@@ -132,6 +132,12 @@ h1 {
   margin: 0 0 16px;
 }
 
+.empty-state-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
 .search-input {
   display: block;
   width: 100%;
@@ -152,6 +158,33 @@ h1 {
 .search-input:focus {
   outline: none;
   border-color: var(--accent);
+}
+
+.link-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.link-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.group-header {
+  margin: 0 0 2px 2px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.group-header .group-count {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 .link-list {

@@ -1,4 +1,4 @@
-import { getConnectedFile, readLinksFile, writeLinksFile } from './src/storage.js';
+import { getConnectedFile, getConnectedFileForAction, readLinksFile, writeLinksFile } from './src/storage.js';
 import { mergeLinks } from './src/linkMerge.js';
 import { tabsToEntries } from './src/tabsToEntries.js';
 
@@ -8,6 +8,8 @@ const statusEl = document.getElementById('status');
 const manageLink = document.getElementById('manage-link');
 
 const NO_FILE_MESSAGE = 'No file connected. Open "View saved links" to connect one.';
+const PERMISSION_DENIED_MESSAGE =
+  'Permission was not granted. Reconnect from "View saved links" if this keeps happening.';
 const CORRUPTED_MESSAGE = 'The connected file isn\'t a valid Tab Saver file — nothing was written. Reconnect from "View saved links".';
 
 let busy = false;
@@ -19,13 +21,15 @@ async function saveTabs(tabs) {
   try {
     let handle;
     try {
-      handle = await getConnectedFile();
+      // Runs inside a click handler, so it's allowed to silently re-request
+      // permission if it was lost (Chrome resets File System Access grants on
+      // every extension reload) — this self-heals without forcing the user
+      // to reconnect the file from scratch.
+      handle = await getConnectedFileForAction();
     } catch (err) {
-      // Treat a lost/denied permission the same as "no file connected" here —
-      // manager.js shows a distinct message for this case, but that level of
-      // detail isn't needed in the popup.
       console.warn('[tab-saver]', err);
-      handle = null;
+      statusEl.textContent = err.code === 'PERMISSION_DENIED' ? PERMISSION_DENIED_MESSAGE : NO_FILE_MESSAGE;
+      return;
     }
     if (!handle) {
       statusEl.textContent = NO_FILE_MESSAGE;
@@ -70,19 +74,26 @@ manageLink.addEventListener('click', (e) => {
 });
 
 async function init() {
-  let handle;
   try {
-    handle = await getConnectedFile();
+    // Passive check only (no requestPermission prompt) since there's no user
+    // gesture at popup load. A PERMISSION_DENIED here doesn't mean "no file
+    // connected" — a file was connected before, it just needs its permission
+    // re-requested, which saveTabs() does automatically once the user clicks
+    // Save (a real click provides the gesture requestPermission needs). So
+    // leave the buttons enabled in that case rather than disabling them.
+    const handle = await getConnectedFile();
+    if (!handle) {
+      saveAllBtn.disabled = true;
+      saveCurrentBtn.disabled = true;
+      statusEl.textContent = NO_FILE_MESSAGE;
+    }
   } catch (err) {
-    // Same simplification as saveTabs(): a thrown PERMISSION_DENIED is
-    // treated identically to "never connected" for the popup's purposes.
     console.warn('[tab-saver]', err);
-    handle = null;
-  }
-  if (!handle) {
-    saveAllBtn.disabled = true;
-    saveCurrentBtn.disabled = true;
-    statusEl.textContent = NO_FILE_MESSAGE;
+    if (err.code !== 'PERMISSION_DENIED') {
+      saveAllBtn.disabled = true;
+      saveCurrentBtn.disabled = true;
+      statusEl.textContent = NO_FILE_MESSAGE;
+    }
   }
 }
 
