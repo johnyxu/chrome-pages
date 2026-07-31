@@ -35,11 +35,15 @@ async function setStoredHandle(handle) {
   });
 }
 
+// Uses queryPermission() only — never requestPermission(). requestPermission()
+// requires transient user activation (a real click); getConnectedFile() below
+// is called from page/popup init() with no active gesture, so calling
+// requestPermission() there would throw a SecurityError instead of resolving
+// to 'denied', preventing PERMISSION_DENIED from ever being raised properly.
+// Re-granting access happens through connectFile() (triggered by a button
+// click, which IS a user gesture), not through this read-only check.
 async function verifyPermission(handle, mode = 'readwrite') {
-  const opts = { mode };
-  if ((await handle.queryPermission(opts)) === 'granted') return true;
-  if ((await handle.requestPermission(opts)) === 'granted') return true;
-  return false;
+  return (await handle.queryPermission({ mode })) === 'granted';
 }
 
 export async function connectFile() {

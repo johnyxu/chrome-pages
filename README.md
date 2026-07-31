@@ -21,6 +21,12 @@ JSON file, and lets you browse or remove saved links from a manager page.
    can be opened or removed. Use "Connect a different file" to switch which
    file the extension reads from and writes to.
 
+Tab Saver is the sole intended writer of the connected JSON file. If the
+connected file is unparseable, or is valid JSON that doesn't match the
+expected `{ "links": [...] }` shape (e.g. it points at some other, unrelated
+`.json` file), the extension detects this and refuses to write — it will
+never merge tabs into it or overwrite it.
+
 ## Run the unit tests
 
 ```bash

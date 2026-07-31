@@ -23,3 +23,14 @@ test('tabsToEntries skips tabs without a usable url', () => {
   const result = tabsToEntries(tabs, { now: () => 'T', idGen: () => 'id' });
   assert.deepEqual(result, []);
 });
+
+test('tabsToEntries skips privileged/non-http(s) urls, keeping http(s) ones', () => {
+  const tabs = [
+    { url: 'chrome://extensions', title: 'Extensions' },
+    { url: 'chrome-extension://abcdef/manager.html', title: 'Manager' },
+    { url: 'javascript:alert(1)', title: 'JS' },
+    { url: 'https://a.com', title: 'A' },
+  ];
+  const result = tabsToEntries(tabs, { now: () => 'T', idGen: () => 'id' });
+  assert.deepEqual(result, [{ id: 'id', url: 'https://a.com', title: 'A', savedAt: 'T' }]);
+});

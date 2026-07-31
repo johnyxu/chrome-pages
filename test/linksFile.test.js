@@ -30,3 +30,14 @@ test('serializeLinksFile round-trips through parseLinksFile', () => {
   const result = parseLinksFile(text);
   assert.deepEqual(result, { links, corrupted: false });
 });
+
+test('serializeLinksFile([]) round-trips through parseLinksFile to an empty, non-corrupted list', () => {
+  const text = serializeLinksFile([]);
+  const result = parseLinksFile(text);
+  assert.deepEqual(result, { links: [], corrupted: false });
+});
+
+test('parseLinksFile flags valid JSON that is not a links object (e.g. a bare array) as corrupted', () => {
+  const result = parseLinksFile('[1,2,3]');
+  assert.deepEqual(result, { links: [], corrupted: true });
+});

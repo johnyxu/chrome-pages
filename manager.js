@@ -10,6 +10,7 @@ const errorEl = document.getElementById('error');
 
 let currentHandle = null;
 let currentLinks = [];
+let busy = false;
 
 function showConnect() {
   connectSection.hidden = false;
@@ -45,11 +46,15 @@ function render() {
     urlSpan.className = 'url';
     urlSpan.textContent = link.url;
 
+    const savedAtSpan = document.createElement('span');
+    savedAtSpan.className = 'saved-at';
+    savedAtSpan.textContent = new Date(link.savedAt).toLocaleDateString();
+
     const removeBtn = document.createElement('button');
     removeBtn.textContent = 'Remove';
     removeBtn.addEventListener('click', () => onRemove(link.id));
 
-    li.append(a, urlSpan, removeBtn);
+    li.append(a, urlSpan, savedAtSpan, removeBtn);
     linkList.append(li);
   }
 }
@@ -66,23 +71,32 @@ async function loadAndRender() {
     render();
     showList();
   } catch (err) {
+    console.warn('[tab-saver]', err);
     showError('Could not read the connected file. Please reconnect.');
     showConnect();
   }
 }
 
 async function onRemove(id) {
-  currentLinks = removeLink(currentLinks, id);
+  if (busy) return;
+  busy = true;
   try {
-    await writeLinksFile(currentHandle, currentLinks);
-    render();
-  } catch (err) {
-    // The write failed (e.g. the file was moved/deleted or permission was
-    // revoked after load), so `currentLinks` is now out of sync with disk.
-    // Re-read from the handle rather than rendering the stale mutated array;
-    // if that also fails, loadAndRender()'s own catch already surfaces the
-    // inline error + reconnect path.
-    await loadAndRender();
+    currentLinks = removeLink(currentLinks, id);
+    try {
+      await writeLinksFile(currentHandle, currentLinks);
+      render();
+    } catch (err) {
+      // The write failed (e.g. the file was moved/deleted or permission was
+      // revoked after load), so `currentLinks` is now out of sync with disk.
+      // Re-read from the handle rather than rendering the stale mutated array;
+      // if that also fails, loadAndRender()'s own catch already surfaces the
+      // inline error + reconnect path.
+      console.warn('[tab-saver]', err);
+      showError('Could not remove — the file may be unavailable. Please reconnect.');
+      await loadAndRender();
+    }
+  } finally {
+    busy = false;
   }
 }
 
@@ -91,6 +105,7 @@ async function onConnectClick() {
     currentHandle = await connectFile();
     await loadAndRender();
   } catch (err) {
+    console.warn('[tab-saver]', err);
     if (err.name !== 'AbortError') {
       showError('Could not connect the file. Please try again.');
     }
@@ -104,6 +119,7 @@ async function init() {
   try {
     currentHandle = await getConnectedFile();
   } catch (err) {
+    console.warn('[tab-saver]', err);
     if (err.code === 'PERMISSION_DENIED') {
       showError('Permission to your saved-links file was lost. Please reconnect.');
     } else {
