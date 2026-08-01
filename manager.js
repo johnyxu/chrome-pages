@@ -10,7 +10,7 @@ import {
 import { removeLink } from './src/linkMerge.js';
 import { filterLinks } from './src/filterLinks.js';
 import { groupLinksByDomain } from './src/groupByDomain.js';
-import { getFavorites, toggleFavorite, reorderFavorites } from './src/favorites.js';
+import { getFavorites, toggleFavorite, reorderFavorites, sortGroupsByFavorite } from './src/favorites.js';
 import { logExpected, logUnexpected } from './src/log.js';
 
 const connectSection = document.getElementById('connect-section');
@@ -308,7 +308,7 @@ function render() {
     return;
   }
 
-  for (const group of groupLinksByDomain(visibleLinks)) {
+  for (const group of sortGroupsByFavorite(groupLinksByDomain(visibleLinks))) {
     const section = document.createElement('section');
     section.className = 'link-group';
 
