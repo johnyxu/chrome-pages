@@ -11,6 +11,7 @@ import { removeLink } from './src/linkMerge.js';
 import { filterLinks } from './src/filterLinks.js';
 import { groupLinksByDomain } from './src/groupByDomain.js';
 import { getFavorites, toggleFavorite, reorderFavorites, sortGroupsByFavorite } from './src/favorites.js';
+import { incrementOpenCount, getLeastViewed } from './src/leastViewed.js';
 import { logExpected, logUnexpected } from './src/log.js';
 
 const connectSection = document.getElementById('connect-section');
@@ -25,6 +26,7 @@ const linkCountEl = document.getElementById('link-count');
 const searchInput = document.getElementById('search-input');
 const viewListBtn = document.getElementById('view-list-btn');
 const viewCardBtn = document.getElementById('view-card-btn');
+const viewLeastViewedBtn = document.getElementById('view-least-viewed-btn');
 const favoritesSidebar = document.getElementById('favorites-sidebar');
 const favoritesList = document.getElementById('favorites-list');
 
@@ -97,6 +99,7 @@ function renderLinkItem(link) {
   a.href = link.url;
   a.textContent = link.title;
   a.target = '_blank';
+  a.addEventListener('click', () => onOpenLink(link.id));
 
   const meta = document.createElement('div');
   meta.className = 'link-meta';
@@ -133,6 +136,7 @@ function renderLinkCard(link) {
   a.href = link.url;
   a.textContent = link.title;
   a.target = '_blank';
+  a.addEventListener('click', () => onOpenLink(link.id));
 
   const urlDiv = document.createElement('div');
   urlDiv.className = 'card-url';
@@ -172,9 +176,10 @@ function renderRemoveButton(link) {
 }
 
 function applyViewMode(mode) {
-  viewMode = mode === 'card' ? 'card' : 'list';
+  viewMode = mode === 'card' || mode === 'least-viewed' ? mode : 'list';
   viewListBtn.setAttribute('aria-pressed', String(viewMode === 'list'));
   viewCardBtn.setAttribute('aria-pressed', String(viewMode === 'card'));
+  viewLeastViewedBtn.setAttribute('aria-pressed', String(viewMode === 'least-viewed'));
 }
 
 function renderFavoriteCard(link) {
@@ -196,6 +201,7 @@ function renderFavoriteCard(link) {
   a.href = link.url;
   a.textContent = link.title;
   a.target = '_blank';
+  a.addEventListener('click', () => onOpenLink(link.id));
 
   const urlDiv = document.createElement('div');
   urlDiv.className = 'favorite-url';
@@ -287,16 +293,61 @@ async function onToggleFavorite(id) {
   }
 }
 
+// Opening a saved link doesn't block on the write — the tab opens
+// immediately regardless — but is still funneled through the `busy` guard
+// so it can't race a concurrent favorite/remove mutation on `currentLinks`.
+async function onOpenLink(id) {
+  if (busy) return;
+  busy = true;
+  try {
+    currentLinks = incrementOpenCount(currentLinks, id);
+    try {
+      await writeLinksFile(currentHandle, currentLinks);
+      if (viewMode === 'least-viewed') render();
+    } catch (err) {
+      logUnexpected('recording link open', err);
+    }
+  } finally {
+    busy = false;
+  }
+}
+
+function renderLeastViewed() {
+  searchInput.hidden = true;
+  const leastViewed = getLeastViewed(currentLinks, 5);
+  linkCountEl.textContent = `${leastViewed.length} least-viewed link${leastViewed.length === 1 ? '' : 's'}`;
+
+  if (leastViewed.length === 0) {
+    renderEmptyMessage('No saved links yet.');
+    return;
+  }
+
+  const container = document.createElement('ul');
+  container.className = 'link-list';
+  for (const link of leastViewed) {
+    container.append(renderLinkItem(link));
+  }
+  linkList.append(container);
+}
+
 function render() {
   linkList.innerHTML = '';
   renderFavorites();
-  const visibleLinks = filterLinks(currentLinks, searchQuery);
 
   if (currentLinks.length === 0) {
     linkCountEl.textContent = '';
+    searchInput.hidden = false;
     renderEmptyMessage('No links saved yet — use the popup to save your first tab.');
     return;
   }
+
+  if (viewMode === 'least-viewed') {
+    renderLeastViewed();
+    return;
+  }
+  searchInput.hidden = false;
+
+  const visibleLinks = filterLinks(currentLinks, searchQuery);
 
   linkCountEl.textContent =
     searchQuery.trim() === ''
@@ -424,6 +475,7 @@ function onViewModeClick(mode) {
 
 viewListBtn.addEventListener('click', () => onViewModeClick('list'));
 viewCardBtn.addEventListener('click', () => onViewModeClick('card'));
+viewLeastViewedBtn.addEventListener('click', () => onViewModeClick('least-viewed'));
 
 async function init() {
   try {

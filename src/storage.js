@@ -141,12 +141,15 @@ export async function setCloseTabAfterSave(value) {
   await setStoredValue(CLOSE_TAB_AFTER_SAVE_KEY, Boolean(value));
 }
 
+const VALID_VIEW_MODES = ['list', 'card', 'least-viewed'];
+
 export async function getViewMode() {
-  return (await getStoredValue(VIEW_MODE_KEY)) === 'card' ? 'card' : 'list';
+  const stored = await getStoredValue(VIEW_MODE_KEY);
+  return VALID_VIEW_MODES.includes(stored) ? stored : 'list';
 }
 
 export async function setViewMode(mode) {
-  await setStoredValue(VIEW_MODE_KEY, mode === 'card' ? 'card' : 'list');
+  await setStoredValue(VIEW_MODE_KEY, VALID_VIEW_MODES.includes(mode) ? mode : 'list');
 }
 
 export async function readLinksFile(handle) {
