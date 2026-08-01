@@ -15,14 +15,22 @@ afterward.
 
 ## Table of Contents
 
-1. [What this extension does for you](#what-this-extension-does-for-you)
-2. [Before you install](#before-you-install)
-3. [Load the extension](#load-the-extension)
-4. [First use: connect a save file](#first-use-connect-a-save-file)
-5. [Saving tabs](#saving-tabs)
-6. [Browsing and managing saved links](#browsing-and-managing-saved-links)
-7. [FAQ](#faq)
-8. [Privacy](#privacy)
+- [Tab Saver User Guide](#tab-saver-user-guide)
+  - [Table of Contents](#table-of-contents)
+  - [What this extension does for you](#what-this-extension-does-for-you)
+  - [Before you install](#before-you-install)
+  - [Load the extension](#load-the-extension)
+  - [First use: connect a save file](#first-use-connect-a-save-file)
+  - [Saving tabs](#saving-tabs)
+    - [Setting: close tab after saving](#setting-close-tab-after-saving)
+  - [Browsing and managing saved links](#browsing-and-managing-saved-links)
+    - [List view](#list-view)
+    - [Card view](#card-view)
+    - [Favorites and drag-to-reorder](#favorites-and-drag-to-reorder)
+    - [Least Viewed view](#least-viewed-view)
+    - [Connecting a different file](#connecting-a-different-file)
+  - [FAQ](#faq)
+  - [Privacy](#privacy)
 
 ---
 
