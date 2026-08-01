@@ -1,0 +1,79 @@
+<svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+  <rect x="0" y="0" width="1000" height="500" fill="#ffffff"/>
+
+  <!-- favorites sidebar -->
+  <rect x="30" y="30" width="200" height="270" rx="12" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="44" y="54" font-size="13" font-weight="600" fill="#1a1a1a">★ Favorites</text>
+
+  <rect x="44" y="68" width="172" height="60" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="54" y="88" font-size="12" font-weight="500" fill="#1a1a1a">Anthropic Claude Docs</text>
+  <text x="54" y="104" font-size="10" fill="#6b7280">docs.anthropic.com</text>
+  <text x="204" y="82" font-size="12" fill="#2563eb" text-anchor="end">★</text>
+
+  <rect x="44" y="136" width="172" height="60" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="54" y="156" font-size="12" font-weight="500" fill="#1a1a1a">claude-code · GitHub</text>
+  <text x="54" y="172" font-size="10" fill="#6b7280">github.com/anthropics</text>
+  <text x="204" y="150" font-size="12" fill="#2563eb" text-anchor="end">★</text>
+
+  <text x="44" y="222" font-size="10" fill="#6b7280">Drag cards to reorder favorites</text>
+
+  <!-- main content -->
+  <text x="250" y="54" font-size="20" font-weight="600" fill="#1a1a1a">Saved Links</text>
+  <text x="250" y="72" font-size="12" fill="#6b7280">128 saved links</text>
+
+  <!-- view toggle -->
+  <rect x="560" y="34" width="90" height="28" fill="#2563eb"/>
+  <text x="605" y="52" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="500">☰ List</text>
+  <rect x="650" y="34" width="90" height="28" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="695" y="52" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="500">▦ Cards</text>
+  <rect x="740" y="34" width="90" height="28" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="785" y="52" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="500">🕓 Least Viewed</text>
+
+  <rect x="850" y="34" width="120" height="28" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="910" y="52" font-size="10" fill="#1a1a1a" text-anchor="middle">Connect a different file</text>
+
+  <!-- search -->
+  <rect x="250" y="90" width="720" height="34" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="262" y="112" font-size="12" fill="#9aa1ac">Search by title or URL…</text>
+
+  <!-- group 1 -->
+  <text x="250" y="150" font-size="11" font-weight="600" fill="#6b7280" letter-spacing="1">GITHUB.COM (3)</text>
+
+  <rect x="250" y="158" width="720" height="50" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="266" y="178" font-size="13" font-weight="500" fill="#1a1a1a">anthropics/claude-code: Claude Code</text>
+  <text x="266" y="196" font-size="11" fill="#6b7280">https://github.com/anthropics/claude-code · 7/20/2026</text>
+  <text x="892" y="188" font-size="13" fill="#2563eb" text-anchor="middle">★</text>
+  <rect x="906" y="173" width="54" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="933" y="189" font-size="10" fill="#6b7280" text-anchor="middle">Remove</text>
+
+  <rect x="250" y="216" width="720" height="50" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="266" y="236" font-size="13" font-weight="500" fill="#1a1a1a">Issues · anthropics/claude-code</text>
+  <text x="266" y="254" font-size="11" fill="#6b7280">https://github.com/anthropics/claude-code/issues · 6/12/2026</text>
+  <text x="892" y="246" font-size="13" fill="#9aa1ac" text-anchor="middle">☆</text>
+  <rect x="906" y="231" width="54" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="933" y="247" font-size="10" fill="#6b7280" text-anchor="middle">Remove</text>
+
+  <rect x="250" y="274" width="720" height="50" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="266" y="294" font-size="13" font-weight="500" fill="#1a1a1a">Pull requests · anthropics/claude-code</text>
+  <text x="266" y="312" font-size="11" fill="#6b7280">https://github.com/anthropics/claude-code/pulls · 5/3/2026</text>
+  <text x="892" y="304" font-size="13" fill="#9aa1ac" text-anchor="middle">☆</text>
+  <rect x="906" y="289" width="54" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="933" y="305" font-size="10" fill="#6b7280" text-anchor="middle">Remove</text>
+
+  <!-- group 2 -->
+  <text x="250" y="352" font-size="11" font-weight="600" fill="#6b7280" letter-spacing="1">STACKOVERFLOW.COM (2)</text>
+
+  <rect x="250" y="360" width="720" height="50" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="266" y="380" font-size="13" font-weight="500" fill="#1a1a1a">How to use the File System Access API</text>
+  <text x="266" y="398" font-size="11" fill="#6b7280">https://stackoverflow.com/questions/123456 · 4/18/2026</text>
+  <text x="892" y="390" font-size="13" fill="#9aa1ac" text-anchor="middle">☆</text>
+  <rect x="906" y="375" width="54" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="933" y="391" font-size="10" fill="#6b7280" text-anchor="middle">Remove</text>
+
+  <rect x="250" y="418" width="720" height="50" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="266" y="438" font-size="13" font-weight="500" fill="#1a1a1a">Manifest V3 service worker lifecycle</text>
+  <text x="266" y="456" font-size="11" fill="#6b7280">https://stackoverflow.com/questions/789012 · 3/2/2026</text>
+  <text x="892" y="448" font-size="13" fill="#9aa1ac" text-anchor="middle">☆</text>
+  <rect x="906" y="433" width="54" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="933" y="449" font-size="10" fill="#6b7280" text-anchor="middle">Remove</text>
+</svg>

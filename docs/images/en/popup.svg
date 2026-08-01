@@ -1,0 +1,23 @@
+<svg viewBox="0 0 260 210" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+  <rect x="0" y="0" width="260" height="210" fill="#eef0f3"/>
+  <rect x="0" y="0" width="260" height="26" fill="#f3f4f6"/>
+  <rect x="222" y="4" width="18" height="18" rx="4" fill="#2563eb"/>
+  <text x="231" y="17" font-size="10" fill="#fff" text-anchor="middle" font-weight="600">T</text>
+
+  <polygon points="222,32 236,32 229,24" fill="#ffffff" stroke="#e5e7eb"/>
+  <rect x="20" y="32" width="220" height="168" rx="8" fill="#ffffff" stroke="#e5e7eb"/>
+
+  <text x="36" y="56" font-size="13" font-weight="600" fill="#1a1a1a">Tab Saver</text>
+  <rect x="204" y="44" width="22" height="20" rx="4" fill="none" stroke="#e5e7eb"/>
+  <text x="215" y="58" font-size="12" fill="#6b7280" text-anchor="middle">⚙</text>
+
+  <rect x="36" y="72" width="188" height="30" rx="6" fill="#2563eb"/>
+  <text x="130" y="91" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="500">Save All Tabs</text>
+
+  <rect x="36" y="108" width="188" height="30" rx="6" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="130" y="127" font-size="12" fill="#1a1a1a" text-anchor="middle" font-weight="500">Save Current Tab</text>
+
+  <text x="36" y="154" font-size="11" fill="#6b7280">Saved 3 tabs (2 new)</text>
+
+  <text x="36" y="180" font-size="12" fill="#2563eb" text-decoration="underline">View saved links (128)</text>
+</svg>

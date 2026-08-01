@@ -1,5 +1,7 @@
 # Tab Saver
 
+**Language:** English | [简体中文](docs/zh/README.md)
+
 A Chrome extension that saves open tabs' URL and title into a single local
 JSON file, and lets you browse, organize, and remove saved links from a
 manager page.
@@ -32,6 +34,9 @@ file picker (File System Access API) — not through `manifest.json`.
 3. Click "Load unpacked" and select this project's folder.
 
 ## Usage
+
+> For a detailed, screenshot-illustrated walkthrough, see the
+> [User Guide](docs/user-guide.md).
 
 ### First-time setup
 
