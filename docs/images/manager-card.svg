@@ -1,0 +1,73 @@
+<svg viewBox="0 0 1000 460" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect x="0" y="0" width="1000" height="460" fill="#ffffff"/>
+
+  <!-- favorites sidebar -->
+  <rect x="30" y="30" width="200" height="270" rx="12" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="44" y="54" font-size="13" font-weight="600" fill="#1a1a1a">★ 收藏</text>
+  <rect x="44" y="68" width="172" height="60" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="54" y="88" font-size="12" font-weight="500" fill="#1a1a1a">Anthropic Claude 文档</text>
+  <text x="54" y="104" font-size="10" fill="#6b7280">docs.anthropic.com</text>
+  <text x="204" y="82" font-size="12" fill="#2563eb" text-anchor="end">★</text>
+  <rect x="44" y="136" width="172" height="60" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="54" y="156" font-size="12" font-weight="500" fill="#1a1a1a">claude-code · GitHub</text>
+  <text x="54" y="172" font-size="10" fill="#6b7280">github.com/anthropics</text>
+  <text x="204" y="150" font-size="12" fill="#2563eb" text-anchor="end">★</text>
+
+  <!-- main content -->
+  <text x="250" y="54" font-size="20" font-weight="600" fill="#1a1a1a">Saved Links</text>
+  <text x="250" y="72" font-size="12" fill="#6b7280">128 saved links</text>
+
+  <rect x="560" y="34" width="90" height="28" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="605" y="52" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="500">☰ List</text>
+  <rect x="650" y="34" width="90" height="28" fill="#2563eb"/>
+  <text x="695" y="52" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="500">▦ Cards</text>
+  <rect x="740" y="34" width="90" height="28" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="785" y="52" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="500">🕓 最少查看</text>
+
+  <rect x="850" y="34" width="120" height="28" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="910" y="52" font-size="11" fill="#1a1a1a" text-anchor="middle">更换文件</text>
+
+  <rect x="250" y="90" width="720" height="34" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="262" y="112" font-size="12" fill="#9aa1ac">按标题或网址搜索…</text>
+
+  <!-- group 1: card grid -->
+  <text x="250" y="150" font-size="11" font-weight="600" fill="#6b7280" letter-spacing="1">GITHUB.COM (3)</text>
+
+  <rect x="250" y="160" width="228" height="110" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="262" y="182" font-size="12" font-weight="500" fill="#1a1a1a">anthropics/claude-code</text>
+  <text x="262" y="198" font-size="10" fill="#6b7280">github.com/anthropics/...</text>
+  <text x="262" y="254" font-size="10" fill="#6b7280">2026/07/20</text>
+  <text x="440" y="256" font-size="12" fill="#2563eb" text-anchor="end">★</text>
+  <text x="466" y="256" font-size="10" fill="#6b7280" text-anchor="end">删除</text>
+
+  <rect x="490" y="160" width="228" height="110" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="502" y="182" font-size="12" font-weight="500" fill="#1a1a1a">claude-code Issues</text>
+  <text x="502" y="198" font-size="10" fill="#6b7280">github.com/.../issues</text>
+  <text x="502" y="254" font-size="10" fill="#6b7280">2026/06/12</text>
+  <text x="680" y="256" font-size="12" fill="#9aa1ac" text-anchor="end">☆</text>
+  <text x="706" y="256" font-size="10" fill="#6b7280" text-anchor="end">删除</text>
+
+  <rect x="730" y="160" width="228" height="110" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="742" y="182" font-size="12" font-weight="500" fill="#1a1a1a">claude-code Pull requests</text>
+  <text x="742" y="198" font-size="10" fill="#6b7280">github.com/.../pulls</text>
+  <text x="742" y="254" font-size="10" fill="#6b7280">2026/05/03</text>
+  <text x="920" y="256" font-size="12" fill="#9aa1ac" text-anchor="end">☆</text>
+  <text x="946" y="256" font-size="10" fill="#6b7280" text-anchor="end">删除</text>
+
+  <!-- group 2: card grid -->
+  <text x="250" y="300" font-size="11" font-weight="600" fill="#6b7280" letter-spacing="1">STACKOVERFLOW.COM (2)</text>
+
+  <rect x="250" y="310" width="228" height="110" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="262" y="332" font-size="12" font-weight="500" fill="#1a1a1a">File System Access API</text>
+  <text x="262" y="348" font-size="10" fill="#6b7280">stackoverflow.com/...</text>
+  <text x="262" y="404" font-size="10" fill="#6b7280">2026/04/18</text>
+  <text x="440" y="406" font-size="12" fill="#9aa1ac" text-anchor="end">☆</text>
+  <text x="466" y="406" font-size="10" fill="#6b7280" text-anchor="end">删除</text>
+
+  <rect x="490" y="310" width="228" height="110" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="502" y="332" font-size="12" font-weight="500" fill="#1a1a1a">MV3 service worker</text>
+  <text x="502" y="348" font-size="10" fill="#6b7280">stackoverflow.com/...</text>
+  <text x="502" y="404" font-size="10" fill="#6b7280">2026/03/02</text>
+  <text x="680" y="406" font-size="12" fill="#9aa1ac" text-anchor="end">☆</text>
+  <text x="706" y="406" font-size="10" fill="#6b7280" text-anchor="end">删除</text>
+</svg>

@@ -1,0 +1,62 @@
+<svg viewBox="0 0 1000 460" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <rect x="0" y="0" width="1000" height="460" fill="#ffffff"/>
+
+  <!-- favorites sidebar -->
+  <rect x="30" y="30" width="200" height="270" rx="12" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="44" y="54" font-size="13" font-weight="600" fill="#1a1a1a">★ 收藏</text>
+  <rect x="44" y="68" width="172" height="60" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="54" y="88" font-size="12" font-weight="500" fill="#1a1a1a">Anthropic Claude 文档</text>
+  <text x="54" y="104" font-size="10" fill="#6b7280">docs.anthropic.com</text>
+  <text x="204" y="82" font-size="12" fill="#2563eb" text-anchor="end">★</text>
+
+  <!-- main content -->
+  <text x="250" y="54" font-size="20" font-weight="600" fill="#1a1a1a">Saved Links</text>
+  <text x="250" y="72" font-size="12" fill="#6b7280">5 least-viewed links</text>
+
+  <rect x="560" y="34" width="90" height="28" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="605" y="52" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="500">☰ List</text>
+  <rect x="650" y="34" width="90" height="28" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="695" y="52" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="500">▦ Cards</text>
+  <rect x="740" y="34" width="90" height="28" fill="#2563eb"/>
+  <text x="785" y="52" font-size="10" fill="#ffffff" text-anchor="middle" font-weight="500">🕓 最少查看</text>
+
+  <rect x="850" y="34" width="120" height="28" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="910" y="52" font-size="11" fill="#1a1a1a" text-anchor="middle">更换文件</text>
+
+  <text x="250" y="90" font-size="11" fill="#9aa1ac">（此视图不分组、不支持搜索，固定展示 5 个链接）</text>
+
+  <rect x="250" y="100" width="720" height="50" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="266" y="120" font-size="13" font-weight="500" fill="#1a1a1a">内部 Wiki：新人上手指南</text>
+  <text x="266" y="138" font-size="11" fill="#6b7280">https://wiki.internal/onboarding · 从未打开 · 2025/11/02</text>
+  <text x="892" y="130" font-size="13" fill="#9aa1ac" text-anchor="middle">☆</text>
+  <rect x="906" y="115" width="54" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="933" y="131" font-size="10" fill="#6b7280" text-anchor="middle">删除</text>
+
+  <rect x="250" y="158" width="720" height="50" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="266" y="178" font-size="13" font-weight="500" fill="#1a1a1a">年度报告模板</text>
+  <text x="266" y="196" font-size="11" fill="#6b7280">https://docs.example.com/report-template · 打开 0 次 · 2025/12/15</text>
+  <text x="892" y="188" font-size="13" fill="#9aa1ac" text-anchor="middle">☆</text>
+  <rect x="906" y="173" width="54" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="933" y="189" font-size="10" fill="#6b7280" text-anchor="middle">删除</text>
+
+  <rect x="250" y="216" width="720" height="50" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="266" y="236" font-size="13" font-weight="500" fill="#1a1a1a">一篇很久前保存的技术博客</text>
+  <text x="266" y="254" font-size="11" fill="#6b7280">https://blog.example.com/old-post · 打开 1 次 · 2026/01/03</text>
+  <text x="892" y="246" font-size="13" fill="#9aa1ac" text-anchor="middle">☆</text>
+  <rect x="906" y="231" width="54" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="933" y="247" font-size="10" fill="#6b7280" text-anchor="middle">删除</text>
+
+  <rect x="250" y="274" width="720" height="50" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="266" y="294" font-size="13" font-weight="500" fill="#1a1a1a">会议纪要 2026-Q1</text>
+  <text x="266" y="312" font-size="11" fill="#6b7280">https://notes.example.com/2026-q1 · 打开 1 次 · 2026/02/20</text>
+  <text x="892" y="304" font-size="13" fill="#9aa1ac" text-anchor="middle">☆</text>
+  <rect x="906" y="289" width="54" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="933" y="305" font-size="10" fill="#6b7280" text-anchor="middle">删除</text>
+
+  <rect x="250" y="332" width="720" height="50" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="266" y="352" font-size="13" font-weight="500" fill="#1a1a1a">某个候补书签</text>
+  <text x="266" y="370" font-size="11" fill="#6b7280">https://example.com/bookmark · 打开 2 次 · 2026/03/10</text>
+  <text x="892" y="362" font-size="13" fill="#9aa1ac" text-anchor="middle">☆</text>
+  <rect x="906" y="347" width="54" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="933" y="363" font-size="10" fill="#6b7280" text-anchor="middle">删除</text>
+</svg>
