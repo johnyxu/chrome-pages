@@ -10,6 +10,7 @@ import {
 import { removeLink } from './src/linkMerge.js';
 import { filterLinks } from './src/filterLinks.js';
 import { groupLinksByDomain } from './src/groupByDomain.js';
+import { getFavorites, toggleFavorite, reorderFavorites } from './src/favorites.js';
 import { logExpected, logUnexpected } from './src/log.js';
 
 const connectSection = document.getElementById('connect-section');
@@ -24,6 +25,8 @@ const linkCountEl = document.getElementById('link-count');
 const searchInput = document.getElementById('search-input');
 const viewListBtn = document.getElementById('view-list-btn');
 const viewCardBtn = document.getElementById('view-card-btn');
+const favoritesSidebar = document.getElementById('favorites-sidebar');
+const favoritesList = document.getElementById('favorites-list');
 
 let currentHandle = null;
 let currentLinks = [];
@@ -54,6 +57,7 @@ function showConnect() {
   connectSection.hidden = false;
   listSection.hidden = true;
   reconnectBtn.hidden = true;
+  favoritesSidebar.hidden = true;
   linkCountEl.textContent = '';
 }
 
@@ -61,6 +65,7 @@ function showList() {
   connectSection.hidden = true;
   listSection.hidden = false;
   reconnectBtn.hidden = false;
+  favoritesSidebar.hidden = false;
 }
 
 function showError(message) {
@@ -111,12 +116,11 @@ function renderLinkItem(link) {
   meta.append(urlSpan, dotSpan, savedAtSpan);
   main.append(a, meta);
 
-  const removeBtn = document.createElement('button');
-  removeBtn.className = 'btn btn-remove';
-  removeBtn.textContent = 'Remove';
-  removeBtn.addEventListener('click', () => onRemove(link.id));
+  const actions = document.createElement('div');
+  actions.className = 'item-actions';
+  actions.append(renderFavoriteToggle(link), renderRemoveButton(link));
 
-  li.append(main, removeBtn);
+  li.append(main, actions);
   return li;
 }
 
@@ -141,14 +145,30 @@ function renderLinkCard(link) {
   dateSpan.className = 'card-date';
   dateSpan.textContent = new Date(link.savedAt).toLocaleDateString();
 
-  const removeBtn = document.createElement('button');
-  removeBtn.className = 'btn btn-remove';
-  removeBtn.textContent = 'Remove';
-  removeBtn.addEventListener('click', () => onRemove(link.id));
+  const actions = document.createElement('div');
+  actions.className = 'item-actions';
+  actions.append(renderFavoriteToggle(link), renderRemoveButton(link));
 
-  footer.append(dateSpan, removeBtn);
+  footer.append(dateSpan, actions);
   card.append(a, urlDiv, footer);
   return card;
+}
+
+function renderFavoriteToggle(link) {
+  const btn = document.createElement('button');
+  btn.className = 'btn-favorite' + (link.favorite ? ' is-favorite' : '');
+  btn.textContent = link.favorite ? '★' : '☆';
+  btn.title = link.favorite ? 'Remove from favorites' : 'Add to favorites';
+  btn.addEventListener('click', () => onToggleFavorite(link.id));
+  return btn;
+}
+
+function renderRemoveButton(link) {
+  const btn = document.createElement('button');
+  btn.className = 'btn btn-remove';
+  btn.textContent = 'Remove';
+  btn.addEventListener('click', () => onRemove(link.id));
+  return btn;
 }
 
 function applyViewMode(mode) {
@@ -157,8 +177,119 @@ function applyViewMode(mode) {
   viewCardBtn.setAttribute('aria-pressed', String(viewMode === 'card'));
 }
 
+function renderFavoriteCard(link) {
+  const card = document.createElement('div');
+  card.className = 'favorite-card';
+  card.draggable = true;
+  card.dataset.id = link.id;
+
+  card.addEventListener('dragstart', () => {
+    card.classList.add('dragging');
+  });
+  card.addEventListener('dragend', () => {
+    card.classList.remove('dragging');
+    persistFavoritesOrder();
+  });
+
+  const a = document.createElement('a');
+  a.className = 'favorite-title';
+  a.href = link.url;
+  a.textContent = link.title;
+  a.target = '_blank';
+
+  const urlDiv = document.createElement('div');
+  urlDiv.className = 'favorite-url';
+  urlDiv.textContent = link.url;
+
+  const unfavBtn = document.createElement('button');
+  unfavBtn.className = 'unfavorite-btn';
+  unfavBtn.title = 'Remove from favorites';
+  unfavBtn.textContent = '★';
+  unfavBtn.addEventListener('click', () => onToggleFavorite(link.id));
+
+  card.append(a, urlDiv, unfavBtn);
+  return card;
+}
+
+function renderFavorites() {
+  favoritesList.innerHTML = '';
+  const favorites = getFavorites(currentLinks);
+  if (favorites.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'favorites-empty';
+    empty.textContent = 'No favorites yet — click ☆ on a link to pin it here.';
+    favoritesList.append(empty);
+    return;
+  }
+  for (const link of favorites) {
+    favoritesList.append(renderFavoriteCard(link));
+  }
+}
+
+// Classic vertical drag-reorder: while dragging, move the dragged card in the
+// DOM to whichever side of its nearest sibling the pointer is closest to.
+// The actual persisted order is only computed and written once, in
+// persistFavoritesOrder(), after the drag ends.
+function getDragAfterElement(container, y) {
+  const elements = [...container.querySelectorAll('.favorite-card:not(.dragging)')];
+  return elements.reduce(
+    (closest, child) => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > closest.offset) {
+        return { offset, element: child };
+      }
+      return closest;
+    },
+    { offset: Number.NEGATIVE_INFINITY, element: null }
+  ).element;
+}
+
+favoritesList.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  const dragging = favoritesList.querySelector('.dragging');
+  if (!dragging) return;
+  const afterElement = getDragAfterElement(favoritesList, e.clientY);
+  if (afterElement == null) {
+    favoritesList.appendChild(dragging);
+  } else {
+    favoritesList.insertBefore(dragging, afterElement);
+  }
+});
+
+async function persistFavoritesOrder() {
+  const orderedIds = [...favoritesList.querySelectorAll('.favorite-card')].map((el) => el.dataset.id);
+  currentLinks = reorderFavorites(currentLinks, orderedIds);
+  try {
+    await writeLinksFile(currentHandle, currentLinks);
+  } catch (err) {
+    logUnexpected('saving favorites order', err);
+    showError('Could not save the new favorites order. Please reconnect.');
+    await loadAndRender();
+  }
+}
+
+async function onToggleFavorite(id) {
+  if (busy) return;
+  busy = true;
+  try {
+    currentLinks = toggleFavorite(currentLinks, id);
+    try {
+      await writeLinksFile(currentHandle, currentLinks);
+      render();
+    } catch (err) {
+      logUnexpected('toggling favorite', err);
+      showError('Could not update favorite — the file may be unavailable. Please reconnect.');
+      await loadAndRender();
+    }
+  } finally {
+    busy = false;
+  }
+}
+
 function render() {
   linkList.innerHTML = '';
+  renderFavorites();
   const visibleLinks = filterLinks(currentLinks, searchQuery);
 
   if (currentLinks.length === 0) {

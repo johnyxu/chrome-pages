@@ -6,30 +6,38 @@
   <link rel="stylesheet" href="manager.css" />
 </head>
 <body>
-  <header class="page-header">
-    <div>
-      <h1>Saved Links</h1>
-      <p class="subtitle" id="link-count"></p>
-    </div>
-    <div class="header-actions">
-      <div class="view-toggle" role="group" aria-label="View mode">
-        <button id="view-list-btn" class="view-toggle-btn" type="button" aria-pressed="true">☰ List</button>
-        <button id="view-card-btn" class="view-toggle-btn" type="button" aria-pressed="false">▦ Cards</button>
+  <div class="page-layout">
+    <aside id="favorites-sidebar" class="favorites-sidebar" hidden>
+      <h2 class="favorites-title">★ Favorites</h2>
+      <div id="favorites-list" class="favorites-list"></div>
+    </aside>
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <h1>Saved Links</h1>
+          <p class="subtitle" id="link-count"></p>
+        </div>
+        <div class="header-actions">
+          <div class="view-toggle" role="group" aria-label="View mode">
+            <button id="view-list-btn" class="view-toggle-btn" type="button" aria-pressed="true">☰ List</button>
+            <button id="view-card-btn" class="view-toggle-btn" type="button" aria-pressed="false">▦ Cards</button>
+          </div>
+          <button id="reconnect-btn" class="btn btn-secondary" hidden>Connect a different file</button>
+        </div>
+      </header>
+      <div id="error" class="banner" hidden></div>
+      <div id="connect-section" class="empty-state">
+        <p id="connect-message">No file connected yet.</p>
+        <div class="empty-state-actions">
+          <button id="grant-btn" class="btn btn-primary" hidden>Grant access</button>
+          <button id="connect-btn" class="btn btn-primary">Connect a file</button>
+        </div>
       </div>
-      <button id="reconnect-btn" class="btn btn-secondary" hidden>Connect a different file</button>
-    </div>
-  </header>
-  <div id="error" class="banner" hidden></div>
-  <div id="connect-section" class="empty-state">
-    <p id="connect-message">No file connected yet.</p>
-    <div class="empty-state-actions">
-      <button id="grant-btn" class="btn btn-primary" hidden>Grant access</button>
-      <button id="connect-btn" class="btn btn-primary">Connect a file</button>
-    </div>
-  </div>
-  <div id="list-section" hidden>
-    <input id="search-input" class="search-input" type="search" placeholder="Search by title or URL…" />
-    <div id="link-list" class="link-groups"></div>
+      <div id="list-section" hidden>
+        <input id="search-input" class="search-input" type="search" placeholder="Search by title or URL…" />
+        <div id="link-list" class="link-groups"></div>
+      </div>
+    </main>
   </div>
   <script type="module" src="manager.js"></script>
 </body>
