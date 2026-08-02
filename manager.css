@@ -65,6 +65,10 @@ body {
   gap: 16px;
 }
 
+.sidebar-column[hidden] {
+  display: none;
+}
+
 .sidebar-box {
   border: 1px solid var(--border);
   border-radius: 12px;
