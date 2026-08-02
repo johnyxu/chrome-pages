@@ -1,5 +1,5 @@
-<svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
-  <rect x="0" y="0" width="1000" height="500" fill="#ffffff"/>
+<svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+  <rect x="0" y="0" width="1000" height="600" fill="#ffffff"/>
 
   <!-- favorites sidebar -->
   <rect x="30" y="30" width="200" height="140" rx="12" fill="#ffffff" stroke="#e5e7eb"/>
@@ -10,7 +10,7 @@
   <text x="204" y="82" font-size="12" fill="#2563eb" text-anchor="end">★</text>
 
   <!-- recent 7 days sidebar -->
-  <rect x="30" y="186" width="200" height="290" rx="12" fill="#ffffff" stroke="#e5e7eb"/>
+  <rect x="30" y="186" width="200" height="376" rx="12" fill="#ffffff" stroke="#e5e7eb"/>
   <text x="44" y="210" font-size="13" font-weight="600" fill="#1a1a1a">🕓 Recent 7 Days</text>
 
   <rect x="44" y="222" width="172" height="30" rx="8" fill="#2563eb"/>
@@ -33,8 +33,17 @@
   <text x="54" y="385" font-size="12" font-weight="500" fill="#1a1a1a">7/19/2026</text>
   <text x="204" y="385" font-size="12" fill="#6b7280" text-anchor="end">1</text>
 
-  <text x="44" y="416" font-size="10" fill="#9aa1ac">Days with no saved tabs are skipped —</text>
-  <text x="44" y="430" font-size="10" fill="#9aa1ac">7/26–27 and 7/20–24 had none.</text>
+  <rect x="44" y="402" width="172" height="30" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="54" y="421" font-size="12" font-weight="500" fill="#1a1a1a">7/12/2026</text>
+  <text x="204" y="421" font-size="12" fill="#6b7280" text-anchor="end">2</text>
+
+  <rect x="44" y="438" width="172" height="30" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="54" y="457" font-size="12" font-weight="500" fill="#1a1a1a">6/30/2026</text>
+  <text x="204" y="457" font-size="12" fill="#6b7280" text-anchor="end">1</text>
+
+  <text x="44" y="488" font-size="10" fill="#9aa1ac">Days with no saved tabs are skipped —</text>
+  <text x="44" y="502" font-size="10" fill="#9aa1ac">7/29–31, 7/26–27, 7/20–24, 7/13–18,</text>
+  <text x="44" y="516" font-size="10" fill="#9aa1ac">and 7/1–11 had none.</text>
 
   <!-- main content -->
   <text x="250" y="54" font-size="20" font-weight="600" fill="#1a1a1a">Saved Links</text>

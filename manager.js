@@ -28,6 +28,7 @@ const searchInput = document.getElementById('search-input');
 const viewListBtn = document.getElementById('view-list-btn');
 const viewCardBtn = document.getElementById('view-card-btn');
 const viewLeastViewedBtn = document.getElementById('view-least-viewed-btn');
+const sidebarColumn = document.querySelector('.sidebar-column');
 const favoritesSidebar = document.getElementById('favorites-sidebar');
 const favoritesList = document.getElementById('favorites-list');
 const recentDaysSidebar = document.getElementById('recent-days-sidebar');
@@ -63,6 +64,7 @@ function showConnect() {
   connectSection.hidden = false;
   listSection.hidden = true;
   reconnectBtn.hidden = true;
+  sidebarColumn.hidden = true;
   favoritesSidebar.hidden = true;
   recentDaysSidebar.hidden = true;
   linkCountEl.textContent = '';
@@ -72,6 +74,7 @@ function showList() {
   connectSection.hidden = true;
   listSection.hidden = false;
   reconnectBtn.hidden = false;
+  sidebarColumn.hidden = false;
   favoritesSidebar.hidden = false;
   recentDaysSidebar.hidden = false;
 }
