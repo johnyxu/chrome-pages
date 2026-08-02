@@ -13,6 +13,7 @@ import { groupLinksByDomain } from './src/groupByDomain.js';
 import { getFavorites, toggleFavorite, reorderFavorites, sortGroupsByFavorite } from './src/favorites.js';
 import { incrementOpenCount, getLeastViewed } from './src/leastViewed.js';
 import { logExpected, logUnexpected } from './src/log.js';
+import { getDateKey, getRecentDayGroups } from './src/recentDays.js';
 
 const connectSection = document.getElementById('connect-section');
 const listSection = document.getElementById('list-section');
@@ -29,6 +30,8 @@ const viewCardBtn = document.getElementById('view-card-btn');
 const viewLeastViewedBtn = document.getElementById('view-least-viewed-btn');
 const favoritesSidebar = document.getElementById('favorites-sidebar');
 const favoritesList = document.getElementById('favorites-list');
+const recentDaysSidebar = document.getElementById('recent-days-sidebar');
+const recentDaysList = document.getElementById('recent-days-list');
 
 let currentHandle = null;
 let currentLinks = [];
@@ -36,6 +39,7 @@ let searchQuery = '';
 let busy = false;
 let pendingHandle = null;
 let viewMode = 'list';
+let selectedDate = null;
 
 function showPermissionLostUI(handle) {
   pendingHandle = handle;
@@ -60,6 +64,7 @@ function showConnect() {
   listSection.hidden = true;
   reconnectBtn.hidden = true;
   favoritesSidebar.hidden = true;
+  recentDaysSidebar.hidden = true;
   linkCountEl.textContent = '';
 }
 
@@ -68,6 +73,7 @@ function showList() {
   listSection.hidden = false;
   reconnectBtn.hidden = false;
   favoritesSidebar.hidden = false;
+  recentDaysSidebar.hidden = false;
 }
 
 function showError(message) {
@@ -232,6 +238,77 @@ function renderFavorites() {
   }
 }
 
+function formatDayLabel(dateKey) {
+  const todayKey = getDateKey(new Date());
+  if (dateKey === todayKey) return 'Today';
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  if (dateKey === getDateKey(yesterday)) return 'Yesterday';
+
+  const [year, month, day] = dateKey.split('-').map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString();
+}
+
+function renderRecentDayButton(group) {
+  const btn = document.createElement('button');
+  btn.className = 'recent-day-btn';
+  btn.type = 'button';
+  btn.setAttribute('aria-pressed', String(group.date === selectedDate));
+
+  const label = document.createElement('span');
+  label.className = 'recent-day-label';
+  label.textContent = formatDayLabel(group.date);
+
+  const count = document.createElement('span');
+  count.className = 'recent-day-count';
+  count.textContent = String(group.links.length);
+
+  btn.append(label, count);
+  btn.addEventListener('click', () => onSelectDate(group.date));
+  return btn;
+}
+
+function renderRecentDays() {
+  recentDaysList.innerHTML = '';
+  const groups = getRecentDayGroups(currentLinks, 7);
+  if (groups.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'recent-days-empty';
+    empty.textContent = 'No recent tabs yet.';
+    recentDaysList.append(empty);
+    return;
+  }
+  for (const group of groups) {
+    recentDaysList.append(renderRecentDayButton(group));
+  }
+}
+
+function onSelectDate(date) {
+  selectedDate = selectedDate === date ? null : date;
+  render();
+}
+
+function renderDateFiltered(date) {
+  searchInput.hidden = true;
+  const dayLinks = currentLinks
+    .filter((link) => getDateKey(new Date(link.savedAt)) === date)
+    .sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+  linkCountEl.textContent = `${dayLinks.length} tab${dayLinks.length === 1 ? '' : 's'} from ${formatDayLabel(date)}`;
+
+  if (dayLinks.length === 0) {
+    renderEmptyMessage('No saved links for this day.');
+    return;
+  }
+
+  const container = document.createElement('ul');
+  container.className = 'link-list';
+  for (const link of dayLinks) {
+    container.append(renderLinkItem(link));
+  }
+  linkList.append(container);
+}
+
 // Classic vertical drag-reorder: while dragging, move the dragged card in the
 // DOM to whichever side of its nearest sibling the pointer is closest to.
 // The actual persisted order is only computed and written once, in
@@ -335,9 +412,21 @@ function render() {
   renderFavorites();
 
   if (currentLinks.length === 0) {
+    selectedDate = null;
+    renderRecentDays();
     linkCountEl.textContent = '';
     searchInput.hidden = false;
     renderEmptyMessage('No links saved yet — use the popup to save your first tab.');
+    return;
+  }
+
+  if (selectedDate && !currentLinks.some((link) => getDateKey(new Date(link.savedAt)) === selectedDate)) {
+    selectedDate = null;
+  }
+  renderRecentDays();
+
+  if (selectedDate) {
+    renderDateFiltered(selectedDate);
     return;
   }
 
@@ -467,7 +556,8 @@ searchInput.addEventListener('input', () => {
 });
 
 function onViewModeClick(mode) {
-  if (mode === viewMode) return;
+  if (mode === viewMode && selectedDate === null) return;
+  selectedDate = null;
   applyViewMode(mode);
   render();
   setViewMode(mode).catch((err) => logUnexpected('saving view mode', err));
