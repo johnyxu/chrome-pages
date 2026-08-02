@@ -1,0 +1,82 @@
+<svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+  <rect x="0" y="0" width="1000" height="500" fill="#ffffff"/>
+
+  <!-- favorites sidebar -->
+  <rect x="30" y="30" width="200" height="140" rx="12" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="44" y="54" font-size="13" font-weight="600" fill="#1a1a1a">★ Favorites</text>
+  <rect x="44" y="68" width="172" height="60" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="54" y="88" font-size="12" font-weight="500" fill="#1a1a1a">Anthropic Claude Docs</text>
+  <text x="54" y="104" font-size="10" fill="#6b7280">docs.anthropic.com</text>
+  <text x="204" y="82" font-size="12" fill="#2563eb" text-anchor="end">★</text>
+
+  <!-- recent 7 days sidebar -->
+  <rect x="30" y="186" width="200" height="290" rx="12" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="44" y="210" font-size="13" font-weight="600" fill="#1a1a1a">🕓 Recent 7 Days</text>
+
+  <rect x="44" y="222" width="172" height="30" rx="8" fill="#2563eb"/>
+  <text x="54" y="241" font-size="12" font-weight="500" fill="#ffffff">Today</text>
+  <text x="204" y="241" font-size="12" fill="#ffffff" text-anchor="end">4</text>
+
+  <rect x="44" y="258" width="172" height="30" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="54" y="277" font-size="12" font-weight="500" fill="#1a1a1a">Yesterday</text>
+  <text x="204" y="277" font-size="12" fill="#6b7280" text-anchor="end">2</text>
+
+  <rect x="44" y="294" width="172" height="30" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="54" y="313" font-size="12" font-weight="500" fill="#1a1a1a">7/28/2026</text>
+  <text x="204" y="313" font-size="12" fill="#6b7280" text-anchor="end">1</text>
+
+  <rect x="44" y="330" width="172" height="30" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="54" y="349" font-size="12" font-weight="500" fill="#1a1a1a">7/25/2026</text>
+  <text x="204" y="349" font-size="12" fill="#6b7280" text-anchor="end">3</text>
+
+  <rect x="44" y="366" width="172" height="30" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="54" y="385" font-size="12" font-weight="500" fill="#1a1a1a">7/19/2026</text>
+  <text x="204" y="385" font-size="12" fill="#6b7280" text-anchor="end">1</text>
+
+  <text x="44" y="416" font-size="10" fill="#9aa1ac">Days with no saved tabs are skipped —</text>
+  <text x="44" y="430" font-size="10" fill="#9aa1ac">7/26–27 and 7/20–24 had none.</text>
+
+  <!-- main content -->
+  <text x="250" y="54" font-size="20" font-weight="600" fill="#1a1a1a">Saved Links</text>
+  <text x="250" y="72" font-size="12" fill="#6b7280">4 tabs from Today</text>
+
+  <rect x="560" y="34" width="90" height="28" fill="#2563eb"/>
+  <text x="605" y="52" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="500">☰ List</text>
+  <rect x="650" y="34" width="90" height="28" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="695" y="52" font-size="11" fill="#6b7280" text-anchor="middle" font-weight="500">▦ Cards</text>
+  <rect x="740" y="34" width="90" height="28" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="785" y="52" font-size="10" fill="#6b7280" text-anchor="middle" font-weight="500">🕓 Least Viewed</text>
+
+  <rect x="850" y="34" width="120" height="28" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="910" y="52" font-size="10" fill="#1a1a1a" text-anchor="middle">Connect a different file</text>
+
+  <text x="250" y="90" font-size="11" fill="#9aa1ac">(Search is hidden while a date filter is active)</text>
+
+  <rect x="250" y="100" width="720" height="50" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="266" y="120" font-size="13" font-weight="500" fill="#1a1a1a">anthropics/claude-code: Claude Code</text>
+  <text x="266" y="138" font-size="11" fill="#6b7280">https://github.com/anthropics/claude-code · 8/2/2026</text>
+  <text x="892" y="130" font-size="13" fill="#2563eb" text-anchor="middle">★</text>
+  <rect x="906" y="115" width="54" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="933" y="131" font-size="10" fill="#6b7280" text-anchor="middle">Remove</text>
+
+  <rect x="250" y="158" width="720" height="50" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="266" y="178" font-size="13" font-weight="500" fill="#1a1a1a">Issues · anthropics/claude-code</text>
+  <text x="266" y="196" font-size="11" fill="#6b7280">https://github.com/anthropics/claude-code/issues · 8/2/2026</text>
+  <text x="892" y="188" font-size="13" fill="#9aa1ac" text-anchor="middle">☆</text>
+  <rect x="906" y="173" width="54" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="933" y="189" font-size="10" fill="#6b7280" text-anchor="middle">Remove</text>
+
+  <rect x="250" y="216" width="720" height="50" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="266" y="236" font-size="13" font-weight="500" fill="#1a1a1a">Pull requests · anthropics/claude-code</text>
+  <text x="266" y="254" font-size="11" fill="#6b7280">https://github.com/anthropics/claude-code/pulls · 8/2/2026</text>
+  <text x="892" y="246" font-size="13" fill="#9aa1ac" text-anchor="middle">☆</text>
+  <rect x="906" y="231" width="54" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="933" y="247" font-size="10" fill="#6b7280" text-anchor="middle">Remove</text>
+
+  <rect x="250" y="274" width="720" height="50" rx="10" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="266" y="294" font-size="13" font-weight="500" fill="#1a1a1a">How to use the File System Access API</text>
+  <text x="266" y="312" font-size="11" fill="#6b7280">https://stackoverflow.com/questions/123456 · 8/2/2026</text>
+  <text x="892" y="304" font-size="13" fill="#9aa1ac" text-anchor="middle">☆</text>
+  <rect x="906" y="289" width="54" height="24" rx="6" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="933" y="305" font-size="10" fill="#6b7280" text-anchor="middle">Remove</text>
+</svg>

@@ -27,6 +27,7 @@ afterward.
     - [List view](#list-view)
     - [Card view](#card-view)
     - [Favorites and drag-to-reorder](#favorites-and-drag-to-reorder)
+    - [Recent 7 Days sidebar](#recent-7-days-sidebar)
     - [Least Viewed view](#least-viewed-view)
     - [Connecting a different file](#connecting-a-different-file)
   - [FAQ](#faq)
@@ -47,6 +48,8 @@ afterward.
   - Browse in either **List** or **Card** view;
   - **Favorite** important links, pin them in a sidebar, and drag to
     reorder them;
+  - Jump straight to a recent day's tabs via the **Recent 7 Days** sidebar
+    list;
   - Check the **Least Viewed** view to quickly find links you saved and
     never opened again;
   - **Remove** links you no longer need.
@@ -191,6 +194,23 @@ sidebar supports **dragging with the mouse**, so you can reorder them
 however you like (e.g. drag the most important one to the top); the new
 order is saved automatically once you drop it. Click the ★ on a card again
 to remove it from favorites.
+
+### Recent 7 Days sidebar
+
+Below the Favorites sidebar, the **"🕓 Recent 7 Days"** box lists the most
+recent dates on which you saved at least one tab:
+
+![Recent 7 Days sidebar](images/en/manager-recent-days.svg)
+
+- Each row shows a date ("Today", "Yesterday", or the full date) and how
+  many tabs were saved that day.
+- Days with zero saved tabs are skipped entirely — if your 3 most recent
+  days have nothing saved, the list reaches further back in time until it
+  has 7 dates with at least one tab.
+- Click a date to filter the main list down to just that day's tabs (search
+  is hidden while a date filter is active). Click the same date again to
+  clear the filter and return to your normal view.
+- Switching to List, Cards, or Least Viewed clears any active date filter.
 
 ### Least Viewed view
 

@@ -68,6 +68,11 @@ a live count of saved links) to:
   favorited links can be **drag-reordered**. Favorites also sort to the
   top of their domain group, and domain groups containing a favorite sort
   above groups that don't.
+- **Recent 7 Days** (left sidebar, below Favorites) — lists the most recent
+  dates that have saved tabs (skipping any day with none, reaching further
+  back as needed to show up to 7 dates), nearest first. Click a date to
+  filter the main list down to just that day's tabs; click it again to
+  clear the filter.
 - **Least Viewed** view — a third view mode showing the 5 saved links
   you've opened the fewest times (ties broken by the oldest save date
   first), a quick way to resurface things you saved and forgot about.
