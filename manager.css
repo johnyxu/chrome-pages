@@ -81,6 +81,65 @@ body {
   font-weight: 600;
 }
 
+.domain-filter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.domain-filter-empty {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.domain-filter-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--fg);
+  cursor: pointer;
+  text-align: left;
+}
+
+.domain-filter-btn:hover {
+  border-color: var(--accent);
+}
+
+.domain-filter-btn[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-fg);
+}
+
+.domain-filter-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.domain-filter-count {
+  flex-shrink: 0;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.domain-filter-btn[aria-pressed="true"] .domain-filter-count {
+  color: var(--accent-fg);
+  opacity: 0.85;
+}
+
 .recent-days-list {
   display: flex;
   flex-direction: column;

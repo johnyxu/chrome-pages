@@ -9,7 +9,7 @@ import {
 } from './src/storage.js';
 import { removeLink } from './src/linkMerge.js';
 import { filterLinks } from './src/filterLinks.js';
-import { groupLinksByDomain } from './src/groupByDomain.js';
+import { getDomain, groupLinksByDomain } from './src/groupByDomain.js';
 import { getFavorites, toggleFavorite, reorderFavorites, sortGroupsByFavorite } from './src/favorites.js';
 import { incrementOpenCount, getLeastViewed } from './src/leastViewed.js';
 import { logExpected, logUnexpected } from './src/log.js';
@@ -33,6 +33,8 @@ const favoritesSidebar = document.getElementById('favorites-sidebar');
 const favoritesList = document.getElementById('favorites-list');
 const recentDaysSidebar = document.getElementById('recent-days-sidebar');
 const recentDaysList = document.getElementById('recent-days-list');
+const domainFilterSidebar = document.getElementById('domain-filter-sidebar');
+const domainFilterList = document.getElementById('domain-filter-list');
 
 let currentHandle = null;
 let currentLinks = [];
@@ -41,6 +43,7 @@ let busy = false;
 let pendingHandle = null;
 let viewMode = 'list';
 let selectedDate = null;
+let selectedDomain = null;
 
 function showPermissionLostUI(handle) {
   pendingHandle = handle;
@@ -66,6 +69,7 @@ function showConnect() {
   reconnectBtn.hidden = true;
   sidebarColumn.hidden = true;
   favoritesSidebar.hidden = true;
+  domainFilterSidebar.hidden = true;
   recentDaysSidebar.hidden = true;
   linkCountEl.textContent = '';
 }
@@ -76,6 +80,7 @@ function showList() {
   reconnectBtn.hidden = false;
   sidebarColumn.hidden = false;
   favoritesSidebar.hidden = false;
+  domainFilterSidebar.hidden = false;
   recentDaysSidebar.hidden = false;
 }
 
@@ -272,6 +277,62 @@ function renderRecentDayButton(group) {
   return btn;
 }
 
+function renderDomainFilter() {
+  domainFilterList.innerHTML = '';
+  const groups = groupLinksByDomain(currentLinks).sort((a, b) => b.links.length - a.links.length);
+  if (groups.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'domain-filter-empty';
+    empty.textContent = 'No domains yet.';
+    domainFilterList.append(empty);
+    return;
+  }
+  for (const group of groups) {
+    const btn = document.createElement('button');
+    btn.className = 'domain-filter-btn';
+    btn.type = 'button';
+    btn.setAttribute('aria-pressed', String(group.domain === selectedDomain));
+
+    const label = document.createElement('span');
+    label.className = 'domain-filter-label';
+    label.textContent = group.domain;
+
+    const count = document.createElement('span');
+    count.className = 'domain-filter-count';
+    count.textContent = String(group.links.length);
+
+    btn.append(label, count);
+    btn.addEventListener('click', () => onSelectDomain(group.domain));
+    domainFilterList.append(btn);
+  }
+}
+
+function onSelectDomain(domain) {
+  selectedDomain = selectedDomain === domain ? null : domain;
+  selectedDate = null;
+  render();
+}
+
+function renderDomainFiltered(domain) {
+  searchInput.hidden = true;
+  const domainLinks = currentLinks
+    .filter((link) => getDomain(link.url) === domain)
+    .sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+  linkCountEl.textContent = `${domainLinks.length} link${domainLinks.length === 1 ? '' : 's'} from ${domain}`;
+
+  if (domainLinks.length === 0) {
+    renderEmptyMessage('No saved links for this domain.');
+    return;
+  }
+
+  const container = document.createElement(viewMode === 'card' ? 'div' : 'ul');
+  container.className = viewMode === 'card' ? 'link-cards' : 'link-list';
+  for (const link of domainLinks) {
+    container.append(viewMode === 'card' ? renderLinkCard(link) : renderLinkItem(link));
+  }
+  linkList.append(container);
+}
+
 function renderRecentDays() {
   recentDaysList.innerHTML = '';
   const groups = getRecentDayGroups(currentLinks, 7);
@@ -416,6 +477,8 @@ function render() {
 
   if (currentLinks.length === 0) {
     selectedDate = null;
+    selectedDomain = null;
+    renderDomainFilter();
     renderRecentDays();
     linkCountEl.textContent = '';
     searchInput.hidden = false;
@@ -426,10 +489,19 @@ function render() {
   if (selectedDate && !currentLinks.some((link) => getDateKey(new Date(link.savedAt)) === selectedDate)) {
     selectedDate = null;
   }
+  if (selectedDomain && !currentLinks.some((link) => getDomain(link.url) === selectedDomain)) {
+    selectedDomain = null;
+  }
+  renderDomainFilter();
   renderRecentDays();
 
   if (selectedDate) {
     renderDateFiltered(selectedDate);
+    return;
+  }
+
+  if (selectedDomain) {
+    renderDomainFiltered(selectedDomain);
     return;
   }
 
@@ -559,8 +631,9 @@ searchInput.addEventListener('input', () => {
 });
 
 function onViewModeClick(mode) {
-  if (mode === viewMode && selectedDate === null) return;
+  if (mode === viewMode && selectedDate === null && selectedDomain === null) return;
   selectedDate = null;
+  selectedDomain = null;
   applyViewMode(mode);
   render();
   setViewMode(mode).catch((err) => logUnexpected('saving view mode', err));
