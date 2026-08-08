@@ -75,15 +75,49 @@ function permissionDeniedError(handle) {
 }
 
 export async function connectFile() {
+  const [handle] = await window.showOpenFilePicker({
+    types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+  });
+
+  // Request write permission while still inside the user-gesture context.
+  const writeGranted = await verifyPermission(handle, 'readwrite', { allowPrompt: true });
+  if (!writeGranted) {
+    const err = new Error('Write permission is required to save tabs.');
+    err.name = 'PermissionDenied';
+    throw err;
+  }
+
+  await setStoredValue(HANDLE_KEY, handle);
+
+  // The backup file is optional: if the user cancels this second picker (or
+  // it fails for any other reason), keep the main connection and just skip
+  // the backup rather than aborting the whole connect flow.
+  try {
+    const [backupHandle] = await window.showOpenFilePicker({
+      types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+    });
+    const backupWriteGranted = await verifyPermission(backupHandle, 'readwrite', { allowPrompt: true });
+    if (backupWriteGranted) {
+      await setStoredValue(BACKUP_HANDLE_KEY, backupHandle);
+    } else {
+      logExpected('backup file write permission denied', null);
+    }
+  } catch (err) {
+    // Expected: the user commonly cancels this second picker to skip having
+    // a backup at all.
+    logExpected('backup file not connected', err);
+  }
+
+  return handle;
+}
+
+export async function createNewFile() {
   const handle = await window.showSaveFilePicker({
     suggestedName: 'saved-tabs.json',
     types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
   });
   await setStoredValue(HANDLE_KEY, handle);
 
-  // The backup file is optional: if the user cancels this second picker (or
-  // it fails for any other reason), keep the main connection and just skip
-  // the backup rather than aborting the whole connect flow.
   try {
     const backupHandle = await window.showSaveFilePicker({
       suggestedName: suggestBackupName(handle.name),
@@ -91,8 +125,6 @@ export async function connectFile() {
     });
     await setStoredValue(BACKUP_HANDLE_KEY, backupHandle);
   } catch (err) {
-    // Expected: the user commonly cancels this second picker to skip having
-    // a backup at all.
     logExpected('backup file not connected', err);
   }
 

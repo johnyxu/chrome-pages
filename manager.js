@@ -1,6 +1,7 @@
 import {
   getConnectedFile,
   connectFile,
+  createNewFile,
   readLinksFile,
   writeLinksFile,
   regrantPermission,
@@ -20,6 +21,7 @@ const listSection = document.getElementById('list-section');
 const linkList = document.getElementById('link-list');
 const connectMessageEl = document.getElementById('connect-message');
 const connectBtn = document.getElementById('connect-btn');
+const newFileBtn = document.getElementById('new-file-btn');
 const grantBtn = document.getElementById('grant-btn');
 const reconnectBtn = document.getElementById('reconnect-btn');
 const errorEl = document.getElementById('error');
@@ -58,7 +60,7 @@ function resetConnectUI() {
   pendingHandle = null;
   connectMessageEl.textContent = 'No file connected yet.';
   grantBtn.hidden = true;
-  connectBtn.textContent = 'Connect a file';
+  connectBtn.textContent = 'Open saved-tabs.json';
   connectBtn.classList.add('btn-primary');
   connectBtn.classList.remove('btn-secondary');
 }
@@ -684,8 +686,11 @@ async function onConnectClick() {
     await loadAndRender();
   } catch (err) {
     if (err.name !== 'AbortError') {
+      const msg = err.name === 'PermissionDenied'
+        ? 'Write permission was not granted. Please try again and allow write access.'
+        : 'Could not connect the file. Please try again.';
       logUnexpected('connecting file', err);
-      showError('Could not connect the file. Please try again.');
+      showError(msg);
     }
   }
 }
@@ -711,6 +716,21 @@ async function onGrantClick() {
 
 connectBtn.addEventListener('click', onConnectClick);
 reconnectBtn.addEventListener('click', onConnectClick);
+newFileBtn.addEventListener('click', async () => {
+  try {
+    currentHandle = await createNewFile();
+    resetConnectUI();
+    clearError();
+    searchQuery = '';
+    searchInput.value = '';
+    await loadAndRender();
+  } catch (err) {
+    if (err.name !== 'AbortError') {
+      logUnexpected('creating new file', err);
+      showError('Could not create the file. Please try again.');
+    }
+  }
+});
 grantBtn.addEventListener('click', onGrantClick);
 searchInput.addEventListener('input', () => {
   searchQuery = searchInput.value;
