@@ -141,31 +141,94 @@ function renderLinkItem(link) {
   return li;
 }
 
-function getFaviconUrl(url) {
+// Returns { type: 'banner'|'favicon', url, faviconUrl }
+function getCardPreview(url) {
   try {
-    const { hostname } = new URL(url);
-    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=64`;
+    const u = new URL(url);
+    const hostname = u.hostname.replace(/^www\./, '');
+    const faviconUrl = `https://${u.hostname}/favicon.ico`;
+
+    if (hostname === 'youtube.com' || hostname === 'youtu.be') {
+      let videoId = null;
+      if (hostname === 'youtu.be') {
+        videoId = u.pathname.slice(1).split('/')[0] || null;
+      } else if (u.pathname === '/watch') {
+        videoId = u.searchParams.get('v');
+      } else if (u.pathname.startsWith('/shorts/') || u.pathname.startsWith('/embed/')) {
+        videoId = u.pathname.split('/')[2] || null;
+      }
+      if (videoId) {
+        return { type: 'banner', url: `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`, faviconUrl };
+      }
+    }
+
+    if (hostname === 'github.com') {
+      const parts = u.pathname.split('/').filter(Boolean);
+      if (parts.length >= 2) {
+        return { type: 'banner', url: `https://opengraph.githubassets.com/1/${parts[0]}/${parts[1]}`, faviconUrl };
+      }
+    }
+
+    if (hostname === 'x.com' || hostname === 'twitter.com') {
+      const parts = u.pathname.split('/').filter(Boolean);
+      // profile pages only: /username
+      if (parts.length === 1 && parts[0] !== 'home' && parts[0] !== 'explore' && parts[0] !== 'search') {
+        return { type: 'banner', url: `https://unavatar.io/twitter/${parts[0]}`, faviconUrl };
+      }
+    }
+
+    return { type: 'favicon', url: faviconUrl, faviconUrl };
   } catch {
-    return '';
+    return null;
   }
 }
+
+// Defers loading src until image approaches the viewport
+const lazyImageObserver = new IntersectionObserver((entries) => {
+  for (const entry of entries) {
+    if (entry.isIntersecting) {
+      const img = entry.target;
+      img.src = img.dataset.lazySrc;
+      delete img.dataset.lazySrc;
+      lazyImageObserver.unobserve(img);
+    }
+  }
+}, { rootMargin: '300px 0px' });
 
 function renderLinkCard(link) {
   const card = document.createElement('div');
   card.className = 'link-card';
 
   const preview = document.createElement('div');
-  preview.className = 'card-preview';
-  const faviconUrl = getFaviconUrl(link.url);
-  if (faviconUrl) {
+  const info = getCardPreview(link.url);
+
+  if (!info) {
+    preview.hidden = true;
+  } else if (info.type === 'banner') {
+    preview.className = 'card-preview card-preview--banner';
     const img = document.createElement('img');
-    img.className = 'card-favicon';
-    img.src = faviconUrl;
+    img.className = 'card-banner-img';
+    // lazy load: set data-lazySrc, observer swaps it to src on scroll
+    img.dataset.lazySrc = info.url;
     img.alt = '';
     img.addEventListener('error', () => { preview.hidden = true; });
-    preview.append(img);
+    lazyImageObserver.observe(img);
+    const badge = document.createElement('img');
+    badge.className = 'card-favicon-badge';
+    badge.dataset.lazySrc = info.faviconUrl;
+    badge.alt = '';
+    badge.addEventListener('error', () => { badge.hidden = true; });
+    lazyImageObserver.observe(badge);
+    preview.append(img, badge);
   } else {
-    preview.hidden = true;
+    preview.className = 'card-preview card-preview--favicon';
+    const img = document.createElement('img');
+    img.className = 'card-favicon';
+    img.dataset.lazySrc = info.url;
+    img.alt = '';
+    img.addEventListener('error', () => { preview.hidden = true; });
+    lazyImageObserver.observe(img);
+    preview.append(img);
   }
 
   const a = document.createElement('a');
@@ -495,6 +558,7 @@ function renderLeastViewed() {
 }
 
 function render() {
+  lazyImageObserver.disconnect();
   linkList.innerHTML = '';
   renderFavorites();
 

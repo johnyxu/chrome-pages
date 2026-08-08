@@ -579,7 +579,34 @@ h1 {
   overflow: hidden;
 }
 
-.card-preview {
+.card-preview--banner {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--border);
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.card-banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-favicon-badge {
+  position: absolute;
+  bottom: 6px;
+  left: 8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: rgba(0,0,0,0.4);
+  padding: 1px;
+}
+
+.card-preview--favicon {
   width: 100%;
   height: 80px;
   background: var(--border);
