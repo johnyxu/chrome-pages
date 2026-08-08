@@ -141,9 +141,32 @@ function renderLinkItem(link) {
   return li;
 }
 
+function getFaviconUrl(url) {
+  try {
+    const { hostname } = new URL(url);
+    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=64`;
+  } catch {
+    return '';
+  }
+}
+
 function renderLinkCard(link) {
   const card = document.createElement('div');
   card.className = 'link-card';
+
+  const preview = document.createElement('div');
+  preview.className = 'card-preview';
+  const faviconUrl = getFaviconUrl(link.url);
+  if (faviconUrl) {
+    const img = document.createElement('img');
+    img.className = 'card-favicon';
+    img.src = faviconUrl;
+    img.alt = '';
+    img.addEventListener('error', () => { preview.hidden = true; });
+    preview.append(img);
+  } else {
+    preview.hidden = true;
+  }
 
   const a = document.createElement('a');
   a.className = 'card-title';
@@ -168,7 +191,7 @@ function renderLinkCard(link) {
   actions.append(renderFavoriteToggle(link), renderRemoveButton(link));
 
   footer.append(dateSpan, actions);
-  card.append(a, urlDiv, footer);
+  card.append(preview, a, urlDiv, footer);
   return card;
 }
 
